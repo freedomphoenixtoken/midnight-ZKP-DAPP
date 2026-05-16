@@ -8,67 +8,8 @@ interface WalletConnectionProps {
 }
 
 export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: WalletConnectionProps) {
-  const [isConnecting, setIsConnecting] = useState(false);
   const [manualAddress, setManualAddress] = useState('');
   const [error, setError] = useState<string | null>(null);
-
-  const handleXUMMConnect = async () => {
-    setIsConnecting(true);
-    setError(null);
-    
-    try {
-      // XUMM SDK integration
-      const XUMM_SDK = (await import('xumm-sdk')).default;
-      const xumm = new XUMM_SDK({
-        apiKey: process.env.VITE_XUMM_API_KEY || '',
-        apiSecret: process.env.VITE_XUMM_API_SECRET || ''
-      });
-
-      const payload = await xumm.payload?.create({
-        txjson: {
-          TransactionType: 'SignIn',
-        },
-        options: {
-          submit: false
-        }
-      });
-
-      if (payload) {
-        // Open XUMM app
-        window.open(payload.next.always, '_blank');
-
-        // Poll for signed payload
-        const pollInterval = setInterval(async () => {
-          const resolved = await xumm.payload?.get(payload.uuid);
-          
-          if (resolved && resolved.meta.signed) {
-            clearInterval(pollInterval);
-            const address = resolved.meta.signed_account;
-            onConnect(address);
-            setIsConnecting(false);
-          } else if (resolved && resolved.meta.resolved === false) {
-            clearInterval(pollInterval);
-            setError('XUMM sign-in cancelled');
-            setIsConnecting(false);
-          }
-        }, 2000);
-
-        // Timeout after 5 minutes
-        setTimeout(() => {
-          clearInterval(pollInterval);
-          if (isConnecting) {
-            setError('XUMM sign-in timed out');
-            setIsConnecting(false);
-          }
-        }, 300000);
-      }
-    } catch (err) {
-      console.error('XUMM connection error:', err);
-      // Fallback to manual entry if XUMM is not configured
-      setError('XUMM not configured. Please enter your address manually.');
-      setIsConnecting(false);
-    }
-  };
 
   const handleManualConnect = () => {
     setError(null);
@@ -146,39 +87,14 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
         </div>
         <div>
           <h3 className="text-lg font-bold text-gray-900">Connect XRPL Wallet</h3>
-          <p className="text-sm text-gray-600">Choose your preferred connection method</p>
+          <p className="text-sm text-gray-600">Enter your XRPL wallet address to fetch real blockchain data</p>
         </div>
-      </div>
-
-      {/* XUMM Connection */}
-      <button
-        onClick={handleXUMMConnect}
-        disabled={isConnecting}
-        className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 px-6 rounded-xl hover:from-gray-800 hover:to-gray-700 transition-all duration-300 shadow-lg hover:shadow-xl mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isConnecting ? (
-          <>
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span className="font-semibold">Connecting to XUMM...</span>
-          </>
-        ) : (
-          <>
-            <Wallet className="w-5 h-5" />
-            <span className="font-semibold">Connect with XUMM Wallet</span>
-          </>
-        )}
-      </button>
-
-      <div className="flex items-center gap-4 my-4">
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-sm text-gray-400 font-medium">OR</span>
-        <div className="flex-1 h-px bg-gray-200" />
       </div>
 
       {/* Manual Address Entry */}
       <div className="space-y-3">
         <label className="block text-sm font-semibold text-gray-900">
-          Enter XRPL Wallet Address
+          XRPL Wallet Address
         </label>
         <input
           type="text"
@@ -198,7 +114,7 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
           disabled={!manualAddress}
           className="w-full bg-purple-600 text-white py-3 px-6 rounded-xl hover:bg-purple-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Connect with Address
+          Connect Wallet
         </button>
       </div>
 
