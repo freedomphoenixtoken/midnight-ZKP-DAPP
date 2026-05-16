@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Wallet, X, CheckCircle, AlertCircle, Copy, ExternalLink } from 'lucide-react';
+import { Wallet, X, CheckCircle, AlertCircle, Copy, ExternalLink, Info } from 'lucide-react';
 
 interface WalletConnectionProps {
   onConnect: (address: string) => void;
@@ -14,14 +14,27 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
   const handleManualConnect = () => {
     setError(null);
     
-    // Basic XRPL address validation
-    const xrplAddressRegex = /^r[a-zA-Z0-9]{25,34}$/;
-    if (!xrplAddressRegex.test(manualAddress)) {
-      setError('Invalid XRPL address. Must start with "r" and be 25-34 characters.');
+    // Comprehensive XRPL address validation
+    if (!manualAddress || manualAddress.trim() === '') {
+      setError('Please enter an XRPL wallet address');
       return;
     }
 
-    onConnect(manualAddress);
+    // XRPL address validation: starts with 'r', 25-34 characters, base58 characters
+    const xrplAddressRegex = /^r[a-zA-Z0-9]{25,34}$/;
+    if (!xrplAddressRegex.test(manualAddress)) {
+      setError('Invalid XRPL address. Must start with "r" and be 25-34 characters');
+      return;
+    }
+
+    // Additional validation: check for common invalid characters
+    const invalidChars = /[IOl0]/;
+    if (invalidChars.test(manualAddress)) {
+      setError('Invalid XRPL address. Contains invalid characters');
+      return;
+    }
+
+    onConnect(manualAddress.trim());
     setManualAddress('');
   };
 
@@ -33,19 +46,19 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
 
   if (connectedAddress) {
     return (
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-green-500 p-3 rounded-full">
+            <div className="bg-green-500 p-3 rounded-full shadow-md">
               <Wallet className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-green-800">Connected</span>
+                <span className="text-sm font-semibold text-green-800">Wallet Connected</span>
                 <CheckCircle className="w-4 h-4 text-green-600" />
               </div>
               <div className="text-sm text-gray-600 font-mono mt-1">
-                {connectedAddress.substring(0, 6)}...{connectedAddress.substring(-4)}
+                {connectedAddress.substring(0, 8)}...{connectedAddress.substring(-8)}
               </div>
             </div>
           </div>
@@ -68,10 +81,10 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
             </a>
             <button
               onClick={onDisconnect}
-              className="p-2 hover:bg-green-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-red-100 rounded-lg transition-colors"
               title="Disconnect"
             >
-              <X className="w-4 h-4 text-green-600" />
+              <X className="w-4 h-4 text-red-600" />
             </button>
           </div>
         </div>
@@ -82,7 +95,7 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
       <div className="flex items-center gap-3 mb-4">
-        <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-3 rounded-xl">
+        <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-3 rounded-xl shadow-md">
           <Wallet className="w-6 h-6 text-white" />
         </div>
         <div>
@@ -99,33 +112,36 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
         <input
           type="text"
           value={manualAddress}
-          onChange={(e) => setManualAddress(e.target.value)}
+          onChange={(e) => {
+            setManualAddress(e.target.value);
+            setError(null);
+          }}
           placeholder="r..."
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-lg"
         />
         {error && (
-          <div className="flex items-center gap-2 text-red-600 text-sm">
-            <AlertCircle className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
           </div>
         )}
         <button
           onClick={handleManualConnect}
           disabled={!manualAddress}
-          className="w-full bg-purple-600 text-white py-3 px-6 rounded-xl hover:bg-purple-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-6 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
         >
           Connect Wallet
         </button>
       </div>
 
       {/* Info */}
-      <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-200">
+      <div className="mt-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
         <div className="flex items-start gap-2">
-          <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <p className="font-semibold mb-1">Privacy Notice</p>
+            <p className="font-semibold mb-1">Privacy & Security</p>
             <p className="text-blue-700">
-              Your wallet data is fetched directly from the XRPL ledger. No sensitive information is stored on our servers.
+              Your wallet data is fetched directly from the XRPL ledger. No sensitive information is stored on our servers. Only proof hashes are stored for verification.
             </p>
           </div>
         </div>
