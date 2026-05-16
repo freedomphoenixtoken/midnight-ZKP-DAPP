@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Gift, AlertCircle, Loader2, Sparkles, CheckCircle2, Eye, Clock, Wallet, ShieldCheck, Twitter, Link as LinkIcon, RefreshCw, Shield } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { QRCode } from '../share/QRCode';
 
 interface AirdropEligibilityProofProps {
   userAddress: string;
@@ -18,6 +20,13 @@ export function AirdropEligibilityProof({ userAddress, onVerified, proofHash, on
   useEffect(() => {
     if (proofHash && !proofGeneratedAt) {
       setProofGeneratedAt(new Date());
+      // Trigger confetti celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6']
+      });
     }
   }, [proofHash, proofGeneratedAt]);
 
@@ -273,13 +282,16 @@ export function AirdropEligibilityProof({ userAddress, onVerified, proofHash, on
               Copy Hash
             </button>
           </div>
-          <button
-            onClick={regenerateProof}
-            className="w-full flex items-center justify-center gap-2 bg-purple-100 text-purple-900 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors border border-purple-300"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Regenerate Proof
-          </button>
+          <div className="flex gap-2 mb-3">
+            <QRCode proofHash={proofHash} featureName="Airdrop Eligibility" />
+            <button
+              onClick={regenerateProof}
+              className="flex-1 flex items-center justify-center gap-2 bg-purple-100 text-purple-900 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors border border-purple-300"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Regenerate Proof
+            </button>
+          </div>
         </div>
       )}
     </div>

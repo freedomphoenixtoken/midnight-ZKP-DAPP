@@ -4,11 +4,15 @@ import { Link } from 'react-router-dom';
 import { GovernancePowerProof } from '../components/zk/GovernancePowerProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 import { ProblemsSolved } from '../components/problems/ProblemsSolved';
+import { DemoMode } from '../components/demo/DemoMode';
+import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
+import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 
 export function GovernancePowerPage() {
   const [userAddress, setUserAddress] = useState('');
   const [proofHash, setProofHash] = useState<string | null>(null);
   const [governanceData, setGovernanceData] = useState<any>(null);
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -40,6 +44,35 @@ export function GovernancePowerPage() {
           <span className="text-sm font-medium text-green-800">Privacy-First: Vote anonymously with verified power</span>
         </div>
       </div>
+
+      {/* Demo Mode */}
+      <DemoMode
+        featureName="Governance Power"
+        onStartDemo={() => setIsDemoRunning(true)}
+        isDemoRunning={isDemoRunning}
+      />
+
+      {/* Data Flow Visualization */}
+      <DataFlowVisualization featureName="Governance Power" />
+
+      {/* Before/After Comparison */}
+      <BeforeAfterComparison
+        featureName="Governance Power"
+        beforeData={[
+          'Exact token count exposed',
+          'Complete voting history visible',
+          'Proposal choices tracked',
+          'Wallet composition revealed',
+          'Delegation patterns analyzed'
+        ]}
+        afterData={[
+          'Only voting power range revealed',
+          'Voting history remains private',
+          'Proposal choices stay hidden',
+          'Wallet composition protected',
+          'Delegation patterns never shared'
+        ]}
+      />
 
       {/* Privacy Visualization */}
       <PrivacyVisualization

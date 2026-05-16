@@ -4,10 +4,14 @@ import { Link } from 'react-router-dom';
 import { CompliancePassport } from '../components/zk/CompliancePassport';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 import { ProblemsSolved } from '../components/problems/ProblemsSolved';
+import { DemoMode } from '../components/demo/DemoMode';
+import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
+import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 
 export function CompliancePage() {
   const [userAddress, setUserAddress] = useState('');
   const [proofHash, setProofHash] = useState<string | null>(null);
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -39,6 +43,35 @@ export function CompliancePage() {
           <span className="text-sm font-medium text-green-800">Privacy-First: Your data stays private</span>
         </div>
       </div>
+
+      {/* Demo Mode */}
+      <DemoMode
+        featureName="Compliance Passport"
+        onStartDemo={() => setIsDemoRunning(true)}
+        isDemoRunning={isDemoRunning}
+      />
+
+      {/* Data Flow Visualization */}
+      <DataFlowVisualization featureName="Compliance Passport" />
+
+      {/* Before/After Comparison */}
+      <BeforeAfterComparison
+        featureName="Compliance Passport"
+        beforeData={[
+          'Full identity documents shared',
+          'KYC details exposed to all',
+          'Accreditation details revealed',
+          'Financial information visible',
+          'Government ID numbers stored'
+        ]}
+        afterData={[
+          'Only compliance status revealed',
+          'KYC details remain private',
+          'Accreditation status only',
+          'Financial information protected',
+          'ID numbers never stored'
+        ]}
+      />
 
       {/* Privacy Visualization */}
       <PrivacyVisualization

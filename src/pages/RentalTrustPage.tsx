@@ -4,11 +4,15 @@ import { Link } from 'react-router-dom';
 import { RentalTrustScore } from '../components/zk/RentalTrustScore';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 import { ProblemsSolved } from '../components/problems/ProblemsSolved';
+import { DemoMode } from '../components/demo/DemoMode';
+import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
+import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 
 export function RentalTrustPage() {
   const [userAddress, setUserAddress] = useState('');
   const [proofHash, setProofHash] = useState<string | null>(null);
   const [stats, setStats] = useState<any>(null);
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -40,6 +44,35 @@ export function RentalTrustPage() {
           <span className="text-sm font-medium text-green-800">Privacy-First: Your rental history stays private</span>
         </div>
       </div>
+
+      {/* Demo Mode */}
+      <DemoMode
+        featureName="Rental Trust Score"
+        onStartDemo={() => setIsDemoRunning(true)}
+        isDemoRunning={isDemoRunning}
+      />
+
+      {/* Data Flow Visualization */}
+      <DataFlowVisualization featureName="Rental Trust Score" />
+
+      {/* Before/After Comparison */}
+      <BeforeAfterComparison
+        featureName="Rental Trust Score"
+        beforeData={[
+          'Complete rental history exposed',
+          'Specific properties rented visible',
+          'Rental timeline tracked',
+          'Landlord information revealed',
+          'Payment amounts shared'
+        ]}
+        afterData={[
+          'Only trust score range revealed',
+          'Property details stay private',
+          'Rental timeline protected',
+          'Landlord identity hidden',
+          'Payment amounts never shared'
+        ]}
+      />
 
       {/* Privacy Visualization */}
       <PrivacyVisualization

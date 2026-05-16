@@ -4,11 +4,15 @@ import { Link } from 'react-router-dom';
 import { RoyaltyComplianceProof } from '../components/zk/RoyaltyComplianceProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 import { ProblemsSolved } from '../components/problems/ProblemsSolved';
+import { DemoMode } from '../components/demo/DemoMode';
+import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
+import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 
 export function RoyaltyCompliancePage() {
   const [userAddress, setUserAddress] = useState('');
   const [proofHash, setProofHash] = useState<string | null>(null);
   const [complianceData, setComplianceData] = useState<any>(null);
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -40,6 +44,35 @@ export function RoyaltyCompliancePage() {
           <span className="text-sm font-medium text-green-800">Privacy-First: Prove you support creators without revealing trades</span>
         </div>
       </div>
+
+      {/* Demo Mode */}
+      <DemoMode
+        featureName="Royalty Compliance"
+        onStartDemo={() => setIsDemoRunning(true)}
+        isDemoRunning={isDemoRunning}
+      />
+
+      {/* Data Flow Visualization */}
+      <DataFlowVisualization featureName="Royalty Compliance" />
+
+      {/* Before/After Comparison */}
+      <BeforeAfterComparison
+        featureName="Royalty Compliance"
+        beforeData={[
+          'Full transaction history exposed',
+          'Counterparty identities revealed',
+          'Specific NFTs traded visible',
+          'Trading patterns analyzed',
+          'Portfolio composition shared'
+        ]}
+        afterData={[
+          'Only compliance status revealed',
+          'Counterparties remain anonymous',
+          'NFT trades stay private',
+          'Trading patterns hidden',
+          'Portfolio composition protected'
+        ]}
+      />
 
       {/* Privacy Visualization */}
       <PrivacyVisualization

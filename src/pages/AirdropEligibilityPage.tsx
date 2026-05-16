@@ -4,11 +4,15 @@ import { Link } from 'react-router-dom';
 import { AirdropEligibilityProof } from '../components/zk/AirdropEligibilityProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 import { ProblemsSolved } from '../components/problems/ProblemsSolved';
+import { DemoMode } from '../components/demo/DemoMode';
+import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
+import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 
 export function AirdropEligibilityPage() {
   const [userAddress, setUserAddress] = useState('');
   const [proofHash, setProofHash] = useState<string | null>(null);
   const [eligibilityData, setEligibilityData] = useState<any>(null);
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -40,6 +44,35 @@ export function AirdropEligibilityPage() {
           <span className="text-sm font-medium text-green-800">Privacy-First: Fair airdrops without privacy invasion</span>
         </div>
       </div>
+
+      {/* Demo Mode */}
+      <DemoMode
+        featureName="Airdrop Eligibility"
+        onStartDemo={() => setIsDemoRunning(true)}
+        isDemoRunning={isDemoRunning}
+      />
+
+      {/* Data Flow Visualization */}
+      <DataFlowVisualization featureName="Airdrop Eligibility" />
+
+      {/* Before/After Comparison */}
+      <BeforeAfterComparison
+        featureName="Airdrop Eligibility"
+        beforeData={[
+          'Full wallet balance exposed',
+          'Complete transaction history shared',
+          'NFT holdings visible to all',
+          'IP address tracked',
+          'Personal identity linked to wallet'
+        ]}
+        afterData={[
+          'Only eligibility status revealed',
+          'Proof hash shared (no data)',
+          'NFT holdings remain private',
+          'IP address never collected',
+          'Identity never linked to proof'
+        ]}
+      />
 
       {/* Privacy Visualization */}
       <PrivacyVisualization

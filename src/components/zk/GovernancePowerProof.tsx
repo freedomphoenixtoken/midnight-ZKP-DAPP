@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Vote, AlertCircle, Loader2, Sparkles, CheckCircle2, Eye, Users, Crown, Twitter, Link as LinkIcon, RefreshCw, Shield, Clock } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { QRCode } from '../share/QRCode';
 
 interface GovernancePowerProofProps {
   userAddress: string;
@@ -18,6 +20,13 @@ export function GovernancePowerProof({ userAddress, onVerified, proofHash, onReg
   useEffect(() => {
     if (proofHash && !proofGeneratedAt) {
       setProofGeneratedAt(new Date());
+      // Trigger confetti celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#8b5cf6', '#6366f1', '#3b82f6', '#22c55e', '#eab308']
+      });
     }
   }, [proofHash, proofGeneratedAt]);
 
@@ -270,13 +279,16 @@ export function GovernancePowerProof({ userAddress, onVerified, proofHash, onReg
               Copy Hash
             </button>
           </div>
-          <button
-            onClick={regenerateProof}
-            className="w-full flex items-center justify-center gap-2 bg-purple-100 text-purple-900 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors border border-purple-300"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Regenerate Proof
-          </button>
+          <div className="flex gap-2 mb-3">
+            <QRCode proofHash={proofHash} featureName="Governance Power" />
+            <button
+              onClick={regenerateProof}
+              className="flex-1 flex items-center justify-center gap-2 bg-purple-100 text-purple-900 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors border border-purple-300"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Regenerate Proof
+            </button>
+          </div>
         </div>
       )}
     </div>
