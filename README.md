@@ -245,28 +245,105 @@ Content-Type: application/json
 - No mock data - everything is real
 - Transparent data sources
 
-### 2. Privacy-First Design
+### 2. Enhanced ZK Circuit Simulation
+- **Sophisticated Groth16 Proof Structure** - Implements realistic ZK proof format with pi_a, pi_b, pi_c components
+- **Cryptographic Commitments** - Generates cryptographic commitments from private inputs
+- **Nullifier Hashes** - Creates unique nullifiers for proof uniqueness
+- **Circuit Hashes** - Each circuit type has a unique circuit hash
+- **Proof Validation** - Validates proof structure, circuit hashes, and expiration
+- **Protocol Support** - Groth16 protocol simulation
+- **Input Validation** - Validates circuit-specific inputs before proof generation
+
+### 3. Privacy-First Design
 - Only proof hashes stored
 - No sensitive data on servers
 - User data stays on their device
 
-### 3. Award-Winning UX
+### 4. Award-Winning UX
 - Clean, focused interface
 - Proof generation at the top
 - Collapsible educational content
 - Interactive visualizations
 
-### 4. Production Ready
+### 5. Production Ready
 - Fully deployed and tested
 - Real blockchain data fetching
 - Comprehensive error handling
 - Mobile responsive
 
-### 5. Educational
+### 6. Educational
 - Interactive demos
 - Before/after comparisons
 - Data flow visualizations
 - Problems solved explanations
+
+## 🔮 ZK Circuit Implementation
+
+### Current Implementation (Sophisticated Simulation)
+
+The DApp currently uses a **sophisticated ZK circuit simulation** that mimics real cryptographic proof generation:
+
+**Features:**
+- Realistic Groth16 proof structure (pi_a, pi_b, pi_c components)
+- Cryptographic commitment generation
+- Nullifier hash generation for proof uniqueness
+- Circuit-specific validation
+- Proof expiration checking (24 hours)
+- Circuit hash verification
+- Protocol specification (Groth16)
+
+**Proof Structure:**
+```typescript
+{
+  proofHash: string;
+  circuitType: string;
+  publicInputs: {
+    commitment: string;
+    nullifier: string;
+    timestamp: number;
+  };
+  proof: {
+    pi_a: string[];
+    pi_b: string[][];
+    pi_c: string[];
+    protocol: 'groth16';
+  };
+  metadata: {
+    circuitHash: string;
+    provingKeyHash: string;
+    verificationKeyHash: string;
+  };
+}
+```
+
+### Path to Real Midnight SDK Integration
+
+For production cryptographic proofs using the actual Midnight SDK, follow these steps:
+
+**Prerequisites:**
+1. Install WSL (Windows Subsystem for Linux)
+2. Install Docker Desktop
+3. Install Compact compiler toolchain
+4. Set up Midnight proof server via Docker
+
+**Steps:**
+1. Compile Compact circuits using the Midnight toolchain
+2. Replace simulation calls with real Midnight SDK calls in `zk-circuit-service.ts`
+3. Update Netlify functions to use compiled circuits
+4. Deploy proof server for circuit execution
+
+**Documentation:**
+- See `src/services/zk-circuit-service.ts` for detailed comments on upgrade path
+- Each function includes notes on what needs to be replaced with real SDK calls
+
+### Why Simulation?
+
+The sophisticated simulation provides:
+- **Hackathon-Ready** - Fully functional without complex toolchain setup
+- **Educational Value** - Demonstrates understanding of ZK concepts
+- **Realistic Structure** - Follows actual Groth16 proof format
+- **Clear Upgrade Path** - Well-documented for real implementation
+- **Production-Ready UX** - All features work end-to-end
 
 ## 🔮 Future Enhancements
 

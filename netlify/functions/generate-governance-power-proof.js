@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { getWalletData, getTrustLines } from '../../src/services/xrpl-service.js';
+import { generateZKProof, CircuitType, validateCircuitInputs, extractProofData } from '../../src/services/zk-circuit-service.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -19,28 +20,42 @@ export const handler = async (event, context) => {
     }
 
     // Fetch real wallet data from XRPL
-    const [walletData, trustLines] = await Promise.all([
-      getWalletData(userAddress, false),
-      getTrustLines(userAddress, false)
-    ]);
+    const walletData = await getWalletData(userAddress, false);
+    const trustLines = await getTrustLines(userAddress, false);
 
-    // Generate ZK proof hash
-    const proofHash = `zk_governance_${userAddress.substring(0, 8)}_${Date.now()}`;
-    
+    // Prepare private inputs for ZK circuit
+    const privateInputs = {
+      xrpBalance: walletData.xrpBalance,
+      tokenHoldings: trustLines.length,
+      trustLines: trustLines
+    };
+
+    // Validate circuit inputs
+    const validation = validateCircuitInputs(CircuitType.GOVERNANCE_POWER, privateInputs);
+    if (!validation.valid) {
+      return { statusCode: 400, body: JSON.stringify({ error: validation.error }) };
+    }
+
+    // Generate ZK proof using sophisticated circuit simulation
+    const zkProof = await generateZKProof(
+      CircuitType.GOVERNANCE_POWER,
+      privateInputs,
+      { address: userAddress }
+    );
+
     // Real governance data based on blockchain data
     const governanceData = {
       xrpBalance: walletData.xrpBalance,
       tokenHoldings: trustLines.length,
-      walletAge: walletData.walletAge,
-      transactionCount: walletData.transactionCount,
-      hasVotingPower: walletData.xrpBalance >= 100 && trustLines.length >= 1
+      hasGovernancePower: walletData.xrpBalance >= 100 && trustLines.length >= 1,
+      proofDetails: extractProofData(zkProof)
     };
 
     // Store proof in database
     const { error: dbError } = await supabase
       .from('zk_proofs')
       .insert({
-        proof_hash: proofHash,
+        proof_hash: zkProof.proofHash,
         proof_type: 'governance_power',
         user_address: userAddress,
         user_did: userDid,
@@ -55,8 +70,13 @@ export const handler = async (event, context) => {
     return {
       statusCode: 200,
       body: JSON.stringify({ 
-        proofHash,
-        governanceData
+        proofHash: zkProof.proofHash,
+        governanceData,
+        zkProof: {
+          commitment: zkProof.publicInputs.commitment,
+          nullifier: zkProof.publicInputs.nullifier,
+          circuitHash: zkProof.metadata.circuitHash
+        }
       })
     };
   } catch (error) {

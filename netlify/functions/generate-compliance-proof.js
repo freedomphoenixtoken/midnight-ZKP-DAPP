@@ -1,59 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
-
-// Mock Midnight Service for demo purposes
-class MidnightService {
-  async generateComplianceProof(input) {
-    return {
-      proof: {
-        user_did: input.userDid,
-        kyc_status: input.kycStatus,
-        accreditation_level: input.accreditationLevel,
-        timestamp: input.verificationTimestamp,
-        signature: 'mock_signature_' + Date.now()
-      },
-      circuit_type: 'compliance_passport',
-      created_at: new Date().toISOString()
-    };
-  }
-
-  async verifyProof(proof, circuitType) {
-    return true; // Mock verification
-  }
-}
-
-// Mock hash function for demo
-function hashProof(proof) {
-  const proofString = JSON.stringify(proof);
-  let hash = 0;
-  for (let i = 0; i < proofString.length; i++) {
-    const char = proofString.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  return 'zk_compliance_' + Math.abs(hash).toString(16);
-}
+import { getWalletData } from '../../src/services/xrpl-service.js';
+import { generateZKProof, CircuitType, validateCircuitInputs, extractProofData } from '../../src/services/zk-circuit-service.js';
 
 const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://gbfrysybngxscjuixqcx.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-const midnightService = new MidnightService();
-
-export const handler = async (event) => {
-  // Enable CORS
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
-  }
-
+export const handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
@@ -68,22 +22,38 @@ export const handler = async (event) => {
     // Fetch real wallet data from XRPL
     const walletData = await getWalletData(userAddress, false);
 
-    // Generate ZK proof hash
-    const proofHash = `zk_compliance_${userAddress.substring(0, 8)}_${Date.now()}`;
-    
+    // Prepare private inputs for ZK circuit
+    const privateInputs = {
+      walletAge: walletData.walletAge,
+      transactionCount: walletData.transactionCount
+    };
+
+    // Validate circuit inputs
+    const validation = validateCircuitInputs(CircuitType.COMPLIANCE_PASSPORT, privateInputs);
+    if (!validation.valid) {
+      return { statusCode: 400, body: JSON.stringify({ error: validation.error }) };
+    }
+
+    // Generate ZK proof using sophisticated circuit simulation
+    const zkProof = await generateZKProof(
+      CircuitType.COMPLIANCE_PASSPORT,
+      privateInputs,
+      { address: userAddress }
+    );
+
     // Real compliance data based on blockchain data
     const complianceData = {
       walletAge: walletData.walletAge,
       transactionCount: walletData.transactionCount,
-      xrpBalance: walletData.xrpBalance,
-      isCompliant: walletData.walletAge >= 90 && walletData.transactionCount >= 20
+      isCompliant: walletData.walletAge >= 90 && walletData.transactionCount >= 20,
+      proofDetails: extractProofData(zkProof)
     };
 
     // Store proof in database
     const { error: dbError } = await supabase
       .from('zk_proofs')
       .insert({
-        proof_hash: proofHash,
+        proof_hash: zkProof.proofHash,
         proof_type: 'compliance_passport',
         user_address: userAddress,
         user_did: userDid,
@@ -97,17 +67,20 @@ export const handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ 
-        proofHash,
-        complianceData
+        proofHash: zkProof.proofHash,
+        complianceData,
+        zkProof: {
+          commitment: zkProof.publicInputs.commitment,
+          nullifier: zkProof.publicInputs.nullifier,
+          circuitHash: zkProof.metadata.circuitHash
+        }
       })
     };
   } catch (error) {
     console.error('Error generating proof:', error);
     return { 
       statusCode: 500, 
-      headers: { 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ error: 'Failed to generate proof', details: error.message }) 
     };
   }

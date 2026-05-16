@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { getWalletData, getNFTHoldings } from '../../src/services/xrpl-service.js';
+import { generateZKProof, CircuitType, validateCircuitInputs, extractProofData } from '../../src/services/zk-circuit-service.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -19,28 +20,42 @@ export const handler = async (event, context) => {
     }
 
     // Fetch real wallet data from XRPL
-    const [walletData, nftData] = await Promise.all([
-      getWalletData(userAddress, false),
-      getNFTHoldings(userAddress, false)
-    ]);
+    const walletData = await getWalletData(userAddress, false);
+    const nftHoldings = await getNFTHoldings(userAddress, false);
 
-    // Generate ZK proof hash
-    const proofHash = `zk_royalty_${userAddress.substring(0, 8)}_${Date.now()}`;
-    
+    // Prepare private inputs for ZK circuit
+    const privateInputs = {
+      transactionCount: walletData.transactionCount,
+      nftCount: nftHoldings.length,
+      nftHoldings: nftHoldings
+    };
+
+    // Validate circuit inputs
+    const validation = validateCircuitInputs(CircuitType.ROYALTY_COMPLIANCE, privateInputs);
+    if (!validation.valid) {
+      return { statusCode: 400, body: JSON.stringify({ error: validation.error }) };
+    }
+
+    // Generate ZK proof using sophisticated circuit simulation
+    const zkProof = await generateZKProof(
+      CircuitType.ROYALTY_COMPLIANCE,
+      privateInputs,
+      { address: userAddress }
+    );
+
     // Real compliance data based on blockchain data
     const complianceData = {
       transactionCount: walletData.transactionCount,
-      nftCount: nftData.nftCount,
-      xrpBalance: walletData.xrpBalance,
-      walletAge: walletData.walletAge,
-      isCompliant: walletData.transactionCount >= 10 && nftData.nftCount >= 1
+      nftCount: nftHoldings.length,
+      isCompliant: walletData.transactionCount >= 10 && nftHoldings.length >= 1,
+      proofDetails: extractProofData(zkProof)
     };
 
     // Store proof in database
     const { error: dbError } = await supabase
       .from('zk_proofs')
       .insert({
-        proof_hash: proofHash,
+        proof_hash: zkProof.proofHash,
         proof_type: 'royalty_compliance',
         user_address: userAddress,
         user_did: userDid,
@@ -55,8 +70,13 @@ export const handler = async (event, context) => {
     return {
       statusCode: 200,
       body: JSON.stringify({ 
-        proofHash,
-        complianceData
+        proofHash: zkProof.proofHash,
+        complianceData,
+        zkProof: {
+          commitment: zkProof.publicInputs.commitment,
+          nullifier: zkProof.publicInputs.nullifier,
+          circuitHash: zkProof.metadata.circuitHash
+        }
       })
     };
   } catch (error) {
