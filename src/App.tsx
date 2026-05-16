@@ -4,6 +4,9 @@ import { HomePage } from './pages/HomePage';
 import { CompliancePage } from './pages/CompliancePage';
 import { RentalTrustPage } from './pages/RentalTrustPage';
 import { VerificationPage } from './pages/VerificationPage';
+import { AirdropEligibilityPage } from './pages/AirdropEligibilityPage';
+import { RoyaltyCompliancePage } from './pages/RoyaltyCompliancePage';
+import { GovernancePowerPage } from './pages/GovernancePowerPage';
 import './index.css';
 
 function App() {
@@ -17,6 +20,9 @@ function App() {
             <Route path="/compliance" element={<CompliancePage />} />
             <Route path="/rental-trust" element={<RentalTrustPage />} />
             <Route path="/verify" element={<VerificationPage />} />
+            <Route path="/airdrop-eligibility" element={<AirdropEligibilityPage />} />
+            <Route path="/royalty-compliance" element={<RoyaltyCompliancePage />} />
+            <Route path="/governance-power" element={<GovernancePowerPage />} />
           </Routes>
         </main>
       </div>

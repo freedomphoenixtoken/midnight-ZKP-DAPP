@@ -22,6 +22,21 @@
   status = 200
 
 [[redirects]]
+  from = "/api/zk/generate-airdrop-eligibility-proof"
+  to = "/.netlify/functions/generate-airdrop-eligibility-proof"
+  status = 200
+
+[[redirects]]
+  from = "/api/zk/generate-royalty-compliance-proof"
+  to = "/.netlify/functions/generate-royalty-compliance-proof"
+  status = 200
+
+[[redirects]]
+  from = "/api/zk/generate-governance-power-proof"
+  to = "/.netlify/functions/generate-governance-power-proof"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Shield, ShieldCheck, ArrowRight, FileCheck, Lock, Eye, Sparkles, Zap, ShieldAlert } from 'lucide-react';
+import { Shield, ShieldCheck, ArrowRight, FileCheck, Lock, Eye, Sparkles, Zap, Gift, Heart, Vote } from 'lucide-react';
 
 export function HomePage() {
   return (
@@ -37,79 +37,126 @@ export function HomePage() {
       </div>
 
       {/* Main Feature Cards with Enhanced UX */}
-      <div className="grid md:grid-cols-2 gap-8 mb-12">
-        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 border border-gray-200 hover:border-blue-300 transform hover:-translate-y-1">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-200 hover:border-blue-300 transform hover:-translate-y-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-blue-100 p-3 rounded-xl group-hover:bg-blue-200 transition-colors">
-              <Shield className="w-8 h-8 text-blue-600" />
+              <Shield className="w-7 h-7 text-blue-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">ZK-Compliance Passport</h2>
+            <h2 className="text-xl font-bold text-gray-900">ZK-Compliance Passport</h2>
           </div>
-          <p className="text-gray-600 mb-6 leading-relaxed">
-            Prove your KYC/accreditation status without revealing personal identity. 
-            <span className="font-semibold text-blue-600"> Required for RWA (Real World Asset) purchases.</span>
+          <p className="text-gray-600 mb-4 leading-relaxed text-sm">
+            Prove your KYC/accreditation status without revealing personal identity.
+            <span className="font-semibold text-blue-600"> Required for RWA purchases.</span>
           </p>
-          <div className="flex items-center gap-2 mb-6 text-sm text-gray-500">
-            <ShieldAlert className="w-4 h-4 text-green-600" />
-            <span>Your data stays private - only proof is shared</span>
-          </div>
           <Link
             to="/compliance"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105 text-sm"
           >
             Generate Proof
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 border border-gray-200 hover:border-purple-300 transform hover:-translate-y-1">
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-200 hover:border-purple-300 transform hover:-translate-y-1">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-purple-100 p-3 rounded-xl group-hover:bg-purple-200 transition-colors">
-              <ShieldCheck className="w-8 h-8 text-purple-600" />
+              <ShieldCheck className="w-7 h-7 text-purple-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">ZK-Rental Trust Score</h2>
+            <h2 className="text-xl font-bold text-gray-900">ZK-Rental Trust Score</h2>
           </div>
-          <p className="text-gray-600 mb-6 leading-relaxed">
-            Prove your rental reliability without revealing your rental history. 
-            <span className="font-semibold text-purple-600"> Required for NFT rental requests.</span>
+          <p className="text-gray-600 mb-4 leading-relaxed text-sm">
+            Prove your rental reliability without revealing your rental history.
+            <span className="font-semibold text-purple-600"> Required for NFT rentals.</span>
           </p>
-          <div className="flex items-center gap-2 mb-6 text-sm text-gray-500">
-            <ShieldAlert className="w-4 h-4 text-green-600" />
-            <span>Show your trust score, hide your history</span>
-          </div>
           <Link
             to="/rental-trust"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2 px-4 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105 text-sm"
           >
             Generate Proof
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
-      </div>
 
-      {/* Verification Section with Trust Indicators */}
-      <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 border border-gray-200 hover:border-green-300 transform hover:-translate-y-1">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="bg-green-100 p-3 rounded-xl group-hover:bg-green-200 transition-colors">
-            <FileCheck className="w-8 h-8 text-green-600" />
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-200 hover:border-orange-300 transform hover:-translate-y-1">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-orange-100 p-3 rounded-xl group-hover:bg-orange-200 transition-colors">
+              <Gift className="w-7 h-7 text-orange-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">ZK-Airdrop Eligibility</h2>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Verify Proofs</h2>
+          <p className="text-gray-600 mb-4 leading-relaxed text-sm">
+            Prove you're a legitimate user without revealing wallet activity.
+            <span className="font-semibold text-orange-600"> Fair airdrops without privacy invasion.</span>
+          </p>
+          <Link
+            to="/airdrop-eligibility"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white py-2 px-4 rounded-lg hover:from-orange-700 hover:to-orange-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105 text-sm"
+          >
+            Generate Proof
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
-        <p className="text-gray-600 mb-6 leading-relaxed">
-          Verify zero-knowledge proofs to check their validity and expiration status. 
-          <span className="font-semibold text-green-600"> Instant verification with cryptographic certainty.</span>
-        </p>
-        <div className="flex items-center gap-2 mb-6 text-sm text-gray-500">
-          <ShieldAlert className="w-4 h-4 text-green-600" />
-          <span>Mathematical proof without data exposure</span>
+
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-200 hover:border-red-300 transform hover:-translate-y-1">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-red-100 p-3 rounded-xl group-hover:bg-red-200 transition-colors">
+              <Heart className="w-7 h-7 text-red-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">ZK-Royalty Compliance</h2>
+          </div>
+          <p className="text-gray-600 mb-4 leading-relaxed text-sm">
+            Prove you support creators without revealing your trades.
+            <span className="font-semibold text-red-600"> Creator-friendly trading proof.</span>
+          </p>
+          <Link
+            to="/royalty-compliance"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 text-white py-2 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105 text-sm"
+          >
+            Generate Proof
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
-        <Link
-          to="/verify"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-6 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105"
-        >
-          Verify Proof
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
+
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-200 hover:border-indigo-300 transform hover:-translate-y-1">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-indigo-100 p-3 rounded-xl group-hover:bg-indigo-200 transition-colors">
+              <Vote className="w-7 h-7 text-indigo-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">ZK-Governance Power</h2>
+          </div>
+          <p className="text-gray-600 mb-4 leading-relaxed text-sm">
+            Prove your voting power without revealing token holdings.
+            <span className="font-semibold text-indigo-600"> Anonymous DAO voting.</span>
+          </p>
+          <Link
+            to="/governance-power"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-2 px-4 rounded-lg hover:from-indigo-700 hover:to-indigo-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105 text-sm"
+          >
+            Generate Proof
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+
+        <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-gray-200 hover:border-green-300 transform hover:-translate-y-1">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-green-100 p-3 rounded-xl group-hover:bg-green-200 transition-colors">
+              <FileCheck className="w-7 h-7 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Verify Proofs</h2>
+          </div>
+          <p className="text-gray-600 mb-4 leading-relaxed text-sm">
+            Verify zero-knowledge proofs to check validity and expiration.
+            <span className="font-semibold text-green-600"> Instant cryptographic verification.</span>
+          </p>
+          <Link
+            to="/verify"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-md hover:shadow-lg group-hover:scale-105 text-sm"
+          >
+            Verify Proof
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
       </div>
 
       {/* Privacy Promise Section */}

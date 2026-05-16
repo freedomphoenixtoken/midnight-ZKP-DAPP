@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, ShieldCheck, FileCheck, Lock, Sparkles, Menu, X } from 'lucide-react';
+import { Shield, ShieldCheck, FileCheck, Lock, Sparkles, Menu, X, Gift, Heart, Vote } from 'lucide-react';
 import { useState } from 'react';
 
 export function Navbar() {
@@ -13,6 +13,9 @@ export function Navbar() {
     { to: '/compliance', icon: Shield, label: 'Compliance' },
     { to: '/rental-trust', icon: ShieldCheck, label: 'Rental Trust' },
     { to: '/verify', icon: FileCheck, label: 'Verify' },
+    { to: '/airdrop-eligibility', icon: Gift, label: 'Airdrop' },
+    { to: '/royalty-compliance', icon: Heart, label: 'Royalty' },
+    { to: '/governance-power', icon: Vote, label: 'Governance' },
   ];
 
   return (
