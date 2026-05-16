@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, ShieldCheck, FileCheck, Lock, Sparkles, Menu, X, Gift, Heart, Vote, Moon, Sun, Code, ShoppingCart } from 'lucide-react';
+import { Shield, ShieldCheck, FileCheck, Lock, Sparkles, Menu, X, Gift, Heart, Vote, Moon, Sun, Code, ShoppingCart, Activity, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -12,8 +12,11 @@ export function Navbar() {
 
   const navItems = [
     { to: '/', icon: FileCheck, label: 'Home' },
+    { to: '/dashboard', icon: Activity, label: 'Dashboard' },
     { to: '/marketplace-demo', icon: ShoppingCart, label: 'Demo' },
     { to: '/widgets', icon: Code, label: 'Widgets' },
+    { to: '/integrations', icon: Code, label: 'Integrations' },
+    { to: '/business', icon: DollarSign, label: 'Business' },
     { to: '/compliance', icon: Shield, label: 'Compliance' },
     { to: '/rental-trust', icon: ShieldCheck, label: 'Rental Trust' },
     { to: '/verify', icon: FileCheck, label: 'Verify' },

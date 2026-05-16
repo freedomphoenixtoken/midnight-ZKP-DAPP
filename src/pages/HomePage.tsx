@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Shield, ShieldCheck, ArrowRight, FileCheck, Lock, Eye, Sparkles, Zap, Gift, Heart, Vote, ShoppingCart, Code } from 'lucide-react';
+import { Shield, ShieldCheck, ArrowRight, FileCheck, Lock, Eye, Sparkles, Zap, Gift, Heart, Vote, ShoppingCart, Code, Activity, DollarSign } from 'lucide-react';
 
 export function HomePage() {
   return (
@@ -162,6 +162,22 @@ export function HomePage() {
       {/* Quick Actions */}
       <div className="grid md:grid-cols-2 gap-6 mb-12">
         <Link
+          to="/dashboard"
+          className="group bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+        >
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-4 rounded-xl group-hover:bg-white/30 transition-colors">
+              <Activity className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-1">Live Dashboard</h3>
+              <p className="text-sm opacity-90">Real-time proof generation analytics</p>
+            </div>
+            <ArrowRight className="w-6 h-6 ml-auto group-hover:translate-x-2 transition-transform" />
+          </div>
+        </Link>
+
+        <Link
           to="/marketplace-demo"
           className="group bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
         >
@@ -179,7 +195,7 @@ export function HomePage() {
 
         <Link
           to="/widgets"
-          className="group bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+          className="group bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
         >
           <div className="flex items-center gap-4">
             <div className="bg-white/20 p-4 rounded-xl group-hover:bg-white/30 transition-colors">
@@ -188,6 +204,22 @@ export function HomePage() {
             <div>
               <h3 className="text-xl font-bold mb-1">Widget Integration</h3>
               <p className="text-sm opacity-90">Embed our widgets into any marketplace</p>
+            </div>
+            <ArrowRight className="w-6 h-6 ml-auto group-hover:translate-x-2 transition-transform" />
+          </div>
+        </Link>
+
+        <Link
+          to="/business"
+          className="group bg-gradient-to-r from-yellow-600 to-orange-600 rounded-2xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+        >
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-4 rounded-xl group-hover:bg-white/30 transition-colors">
+              <DollarSign className="w-8 h-8" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold mb-1">Business Model</h3>
+              <p className="text-sm opacity-90">How marketplaces can monetize ZK verification</p>
             </div>
             <ArrowRight className="w-6 h-6 ml-auto group-hover:translate-x-2 transition-transform" />
           </div>

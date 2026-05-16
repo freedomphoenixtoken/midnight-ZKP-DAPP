@@ -9,6 +9,9 @@ import { RoyaltyCompliancePage } from './pages/RoyaltyCompliancePage';
 import { GovernancePowerPage } from './pages/GovernancePowerPage';
 import { WidgetsPage } from './pages/WidgetsPage';
 import { MarketplaceDemoPage } from './pages/MarketplaceDemoPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { IntegrationsPage } from './pages/IntegrationsPage';
+import { BusinessPage } from './pages/BusinessPage';
 import { ThemeProvider } from './contexts/ThemeContext';
 import './index.css';
 
@@ -29,6 +32,9 @@ function App() {
               <Route path="/governance-power" element={<GovernancePowerPage />} />
               <Route path="/widgets" element={<WidgetsPage />} />
               <Route path="/marketplace-demo" element={<MarketplaceDemoPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/integrations" element={<IntegrationsPage />} />
+              <Route path="/business" element={<BusinessPage />} />
             </Routes>
           </main>
         </div>
