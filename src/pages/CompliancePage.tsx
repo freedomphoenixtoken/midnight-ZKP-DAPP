@@ -60,8 +60,12 @@ export function CompliancePage() {
         {userAddress && (
           <CompliancePassport
             userAddress={userAddress}
+            proofHash={proofHash || undefined}
             onVerified={(hash) => {
               setProofHash(hash);
+            }}
+            onRegenerate={() => {
+              setProofHash(null);
             }}
           />
         )}

@@ -1,15 +1,83 @@
-import { useState } from 'react';
-import { ShieldCheck, AlertCircle, Loader2, Lock, Sparkles, CheckCircle2, Eye, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShieldCheck, AlertCircle, Loader2, Lock, Sparkles, CheckCircle2, Eye, TrendingUp, Clock, Twitter, Link as LinkIcon, RefreshCw } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { QRCode } from '../share/QRCode';
 
 interface RentalTrustScoreProps {
   userAddress: string;
   onVerified: (hash: string, stats: any) => void;
+  proofHash?: string;
+  onRegenerate?: () => void;
 }
 
-export function RentalTrustScore({ userAddress, onVerified }: RentalTrustScoreProps) {
+export function RentalTrustScore({ userAddress, onVerified, proofHash, onRegenerate }: RentalTrustScoreProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generationStep, setGenerationStep] = useState(0);
+  const [proofGeneratedAt, setProofGeneratedAt] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
+
+  useEffect(() => {
+    if (proofHash && !proofGeneratedAt) {
+      setProofGeneratedAt(new Date());
+      // Trigger confetti celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#a855f7', '#ec4899', '#f43f5e', '#22c55e', '#3b82f6']
+      });
+    }
+  }, [proofHash, proofGeneratedAt]);
+
+  useEffect(() => {
+    if (!proofGeneratedAt) return;
+
+    const calculateTimeRemaining = () => {
+      const now = new Date();
+      const expiration = new Date(proofGeneratedAt.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+      const diff = expiration.getTime() - now.getTime();
+
+      if (diff <= 0) return 'Expired';
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      if (days > 0) return `${days}d ${hours}h remaining`;
+      if (hours > 0) return `${hours}h ${minutes}m remaining`;
+      return `${minutes}m remaining`;
+    };
+
+    setTimeRemaining(calculateTimeRemaining());
+    const interval = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [proofGeneratedAt]);
+
+  const shareOnTwitter = () => {
+    if (!proofHash) return;
+    const text = `I just generated a ZK-Rental Trust Score proof without revealing my rental history! 🔐 Privacy-first rental verification is here. #ZeroKnowledge #MidnightNetwork #Rental`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const copyProofHash = () => {
+    if (!proofHash) return;
+    navigator.clipboard.writeText(proofHash);
+  };
+
+  const regenerateProof = () => {
+    setProofGeneratedAt(null);
+    setTimeRemaining('');
+    if (onRegenerate) {
+      onRegenerate();
+    } else {
+      generateProof();
+    }
+  };
 
   const generateProof = async () => {
     setIsGenerating(true);
@@ -62,6 +130,66 @@ export function RentalTrustScore({ userAddress, onVerified }: RentalTrustScorePr
     { text: 'Encrypting rental data...', icon: Lock },
     { text: 'Creating trust score proof...', icon: CheckCircle2 }
   ];
+
+  // Show proof display if proofHash exists
+  if (proofHash) {
+    return (
+      <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-purple-500 p-3 rounded-full shadow-md">
+            <CheckCircle2 className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="text-lg font-bold text-purple-800">Proof Generated Successfully!</div>
+            <div className="text-sm text-purple-600 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {timeRemaining}
+            </div>
+          </div>
+        </div>
+
+        {/* Proof Hash Display */}
+        <div className="bg-white rounded-xl p-4 mb-4 border border-purple-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Proof Hash</span>
+            <button
+              onClick={copyProofHash}
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+            >
+              <LinkIcon className="w-3 h-3" />
+              Copy
+            </button>
+          </div>
+          <div className="text-sm font-mono text-gray-800 break-all bg-gray-50 p-2 rounded">
+            {proofHash}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={shareOnTwitter}
+            className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Twitter className="w-4 h-4" />
+            Share
+          </button>
+          <button
+            onClick={regenerateProof}
+            className="flex-1 flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Regenerate
+          </button>
+        </div>
+
+        {/* QR Code */}
+        <div className="bg-white rounded-xl p-4 border border-purple-200">
+          <QRCode proofHash={proofHash} featureName="Rental Trust Score" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">

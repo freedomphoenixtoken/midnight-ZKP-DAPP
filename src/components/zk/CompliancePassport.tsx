@@ -1,15 +1,83 @@
-import { useState } from 'react';
-import { Shield, AlertCircle, Loader2, Lock, Sparkles, CheckCircle2, Eye, ShieldCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, AlertCircle, Loader2, Sparkles, CheckCircle2, Eye, Clock, Twitter, Link as LinkIcon, RefreshCw, Lock } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { QRCode } from '../share/QRCode';
 
 interface CompliancePassportProps {
   userAddress: string;
   onVerified: (hash: string) => void;
+  proofHash?: string;
+  onRegenerate?: () => void;
 }
 
-export function CompliancePassport({ userAddress, onVerified }: CompliancePassportProps) {
+export function CompliancePassport({ userAddress, onVerified, proofHash, onRegenerate }: CompliancePassportProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generationStep, setGenerationStep] = useState(0);
+  const [proofGeneratedAt, setProofGeneratedAt] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
+
+  useEffect(() => {
+    if (proofHash && !proofGeneratedAt) {
+      setProofGeneratedAt(new Date());
+      // Trigger confetti celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#22c55e', '#f59e0b']
+      });
+    }
+  }, [proofHash, proofGeneratedAt]);
+
+  useEffect(() => {
+    if (!proofGeneratedAt) return;
+
+    const calculateTimeRemaining = () => {
+      const now = new Date();
+      const expiration = new Date(proofGeneratedAt.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+      const diff = expiration.getTime() - now.getTime();
+
+      if (diff <= 0) return 'Expired';
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      if (days > 0) return `${days}d ${hours}h remaining`;
+      if (hours > 0) return `${hours}h ${minutes}m remaining`;
+      return `${minutes}m remaining`;
+    };
+
+    setTimeRemaining(calculateTimeRemaining());
+    const interval = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [proofGeneratedAt]);
+
+  const shareOnTwitter = () => {
+    if (!proofHash) return;
+    const text = `I just generated a ZK-Compliance Passport proof without revealing my personal identity! 🔐 Privacy-first compliance is here. #ZeroKnowledge #MidnightNetwork #Privacy`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const copyProofHash = () => {
+    if (!proofHash) return;
+    navigator.clipboard.writeText(proofHash);
+  };
+
+  const regenerateProof = () => {
+    setProofGeneratedAt(null);
+    setTimeRemaining('');
+    if (onRegenerate) {
+      onRegenerate();
+    } else {
+      generateProof();
+    }
+  };
 
   const generateProof = async () => {
     setIsGenerating(true);
@@ -61,9 +129,69 @@ export function CompliancePassport({ userAddress, onVerified }: CompliancePasspo
     { text: 'Initializing secure environment...', icon: Lock },
     { text: 'Encrypting personal data...', icon: Shield },
     { text: 'Generating zero-knowledge proof...', icon: Sparkles },
-    { text: 'Verifying cryptographic signature...', icon: ShieldCheck },
+    { text: 'Verifying cryptographic signature...', icon: CheckCircle2 },
     { text: 'Creating proof hash...', icon: CheckCircle2 }
   ];
+
+  // Show proof display if proofHash exists
+  if (proofHash) {
+    return (
+      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-green-500 p-3 rounded-full shadow-md">
+            <CheckCircle2 className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="text-lg font-bold text-green-800">Proof Generated Successfully!</div>
+            <div className="text-sm text-green-600 flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {timeRemaining}
+            </div>
+          </div>
+        </div>
+
+        {/* Proof Hash Display */}
+        <div className="bg-white rounded-xl p-4 mb-4 border border-green-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Proof Hash</span>
+            <button
+              onClick={copyProofHash}
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+            >
+              <LinkIcon className="w-3 h-3" />
+              Copy
+            </button>
+          </div>
+          <div className="text-sm font-mono text-gray-800 break-all bg-gray-50 p-2 rounded">
+            {proofHash}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={shareOnTwitter}
+            className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Twitter className="w-4 h-4" />
+            Share
+          </button>
+          <button
+            onClick={regenerateProof}
+            className="flex-1 flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Regenerate
+          </button>
+        </div>
+
+        {/* QR Code */}
+        <div className="bg-white rounded-xl p-4 border border-green-200">
+          <QRCode proofHash={proofHash} featureName="Compliance Passport" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">

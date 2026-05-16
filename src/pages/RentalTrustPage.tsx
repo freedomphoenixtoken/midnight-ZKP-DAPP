@@ -62,9 +62,14 @@ export function RentalTrustPage() {
         {userAddress && (
           <RentalTrustScore
             userAddress={userAddress}
+            proofHash={proofHash || undefined}
             onVerified={(hash, data) => {
               setProofHash(hash);
               setStats(data);
+            }}
+            onRegenerate={() => {
+              setProofHash(null);
+              setStats(null);
             }}
           />
         )}
