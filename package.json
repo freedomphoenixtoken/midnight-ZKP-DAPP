@@ -24,7 +24,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
-    "xrpl": "^2.7.0"
+    "xrpl": "^2.14.3",
+    "xumm-sdk": "^1.11.2"
   },
   "devDependencies": {
     "@netlify/functions": "^2.4.0",

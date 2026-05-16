@@ -1,24 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-
-// Mock Midnight Service for demonstration
-class MidnightService {
-  async generateAirdropEligibilityProof(userAddress, userDid) {
-    // Simulate proof generation
-    const proofHash = `zk_airdrop_${userAddress.substring(0, 8)}_${Date.now()}`;
-    
-    // Mock eligibility data
-    const eligibilityData = {
-      walletAge: 45, // days
-      transactionCount: 12,
-      holdsXRP: true,
-      isEligible: true
-    };
-    
-    return { proofHash, eligibilityData };
-  }
-}
-
-const midnightService = new MidnightService();
+import { getWalletData } from '../../src/services/xrpl-service.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -37,8 +18,20 @@ export const handler = async (event, context) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'userAddress is required' }) };
     }
 
-    // Generate ZK proof
-    const { proofHash, eligibilityData } = await midnightService.generateAirdropEligibilityProof(userAddress, userDid);
+    // Fetch real wallet data from XRPL
+    const walletData = await getWalletData(userAddress, false); // Use testnet for demo
+
+    // Generate ZK proof hash (in production, this would use actual ZK circuits)
+    const proofHash = `zk_airdrop_${userAddress.substring(0, 8)}_${Date.now()}`;
+    
+    // Real eligibility data based on blockchain data
+    const eligibilityData = {
+      walletAge: walletData.walletAge,
+      transactionCount: walletData.transactionCount,
+      holdsXRP: walletData.holdsXRP,
+      xrpBalance: walletData.xrpBalance,
+      isEligible: walletData.walletAge >= 30 && walletData.transactionCount >= 5 && walletData.holdsXRP
+    };
 
     // Store proof in database
     const { error: dbError } = await supabase
@@ -54,7 +47,6 @@ export const handler = async (event, context) => {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      // Continue even if database insert fails for demo purposes
     }
 
     return {
@@ -68,7 +60,7 @@ export const handler = async (event, context) => {
     console.error('Error generating proof:', error);
     return { 
       statusCode: 500, 
-      body: JSON.stringify({ error: 'Failed to generate proof' }) 
+      body: JSON.stringify({ error: 'Failed to generate proof', details: error.message }) 
     };
   }
 };

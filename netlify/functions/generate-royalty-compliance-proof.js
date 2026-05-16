@@ -1,24 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-
-// Mock Midnight Service for demonstration
-class MidnightService {
-  async generateRoyaltyComplianceProof(userAddress, userDid) {
-    // Simulate proof generation
-    const proofHash = `zk_royalty_${userAddress.substring(0, 8)}_${Date.now()}`;
-    
-    // Mock compliance data
-    const complianceData = {
-      transactions: 8,
-      totalRoyalties: 125.5,
-      royaltyRate: 100, // percentage
-      isCompliant: true
-    };
-    
-    return { proofHash, complianceData };
-  }
-}
-
-const midnightService = new MidnightService();
+import { getWalletData, getNFTHoldings } from '../../src/services/xrpl-service.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -37,8 +18,23 @@ export const handler = async (event, context) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'userAddress is required' }) };
     }
 
-    // Generate ZK proof
-    const { proofHash, complianceData } = await midnightService.generateRoyaltyComplianceProof(userAddress, userDid);
+    // Fetch real wallet data from XRPL
+    const [walletData, nftData] = await Promise.all([
+      getWalletData(userAddress, false),
+      getNFTHoldings(userAddress, false)
+    ]);
+
+    // Generate ZK proof hash
+    const proofHash = `zk_royalty_${userAddress.substring(0, 8)}_${Date.now()}`;
+    
+    // Real compliance data based on blockchain data
+    const complianceData = {
+      transactionCount: walletData.transactionCount,
+      nftCount: nftData.nftCount,
+      xrpBalance: walletData.xrpBalance,
+      walletAge: walletData.walletAge,
+      isCompliant: walletData.transactionCount >= 10 && nftData.nftCount >= 1
+    };
 
     // Store proof in database
     const { error: dbError } = await supabase
@@ -49,12 +45,11 @@ export const handler = async (event, context) => {
         user_address: userAddress,
         user_did: userDid,
         proof_data: complianceData,
-        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
       });
 
     if (dbError) {
       console.error('Database error:', dbError);
-      // Continue even if database insert fails for demo purposes
     }
 
     return {
@@ -68,7 +63,7 @@ export const handler = async (event, context) => {
     console.error('Error generating proof:', error);
     return { 
       statusCode: 500, 
-      body: JSON.stringify({ error: 'Failed to generate proof' }) 
+      body: JSON.stringify({ error: 'Failed to generate proof', details: error.message }) 
     };
   }
 };

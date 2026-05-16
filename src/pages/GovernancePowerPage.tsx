@@ -8,6 +8,7 @@ import { DemoMode } from '../components/demo/DemoMode';
 import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
 import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 import { Accordion } from '../components/ui/Accordion';
+import { WalletConnection } from '../components/wallet/WalletConnection';
 
 export function GovernancePowerPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -47,21 +48,17 @@ export function GovernancePowerPage() {
       </div>
 
       {/* Main Action Section - Prominent at Top */}
-      <div className="bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-2xl p-8 mb-6 border-2 border-purple-200">
-        <div className="flex items-center gap-2 mb-4">
-          <Crown className="w-5 h-5 text-purple-600" />
-          <label className="text-lg font-bold text-gray-900">Generate Your Proof</label>
-        </div>
-        <input
-          type="text"
-          value={userAddress}
-          onChange={(e) => setUserAddress(e.target.value)}
-          placeholder="Enter XRPL wallet address (r...)"
-          className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-200 text-lg mb-3"
+      <div className="space-y-4 mb-6">
+        <WalletConnection 
+          onConnect={setUserAddress}
+          onDisconnect={() => {
+            setUserAddress('');
+            setProofHash(null);
+            setGovernanceData(null);
+          }}
+          connectedAddress={userAddress}
         />
-        <p className="text-sm text-gray-600 mb-4">
-          Your token holdings stay private. Only voting power is revealed.
-        </p>
+        
         {userAddress && (
           <GovernancePowerProof 
             userAddress={userAddress}

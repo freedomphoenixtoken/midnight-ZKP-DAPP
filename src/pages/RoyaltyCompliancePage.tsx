@@ -8,6 +8,7 @@ import { DemoMode } from '../components/demo/DemoMode';
 import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
 import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 import { Accordion } from '../components/ui/Accordion';
+import { WalletConnection } from '../components/wallet/WalletConnection';
 
 export function RoyaltyCompliancePage() {
   const [userAddress, setUserAddress] = useState('');
@@ -47,21 +48,17 @@ export function RoyaltyCompliancePage() {
       </div>
 
       {/* Main Action Section - Prominent at Top */}
-      <div className="bg-gradient-to-br from-white to-red-50 rounded-2xl shadow-2xl p-8 mb-6 border-2 border-red-200">
-        <div className="flex items-center gap-2 mb-4">
-          <Coins className="w-5 h-5 text-red-600" />
-          <label className="text-lg font-bold text-gray-900">Generate Your Proof</label>
-        </div>
-        <input
-          type="text"
-          value={userAddress}
-          onChange={(e) => setUserAddress(e.target.value)}
-          placeholder="Enter XRPL wallet address (r...)"
-          className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-500/30 focus:border-red-500 transition-all duration-200 text-lg mb-3"
+      <div className="space-y-4 mb-6">
+        <WalletConnection 
+          onConnect={setUserAddress}
+          onDisconnect={() => {
+            setUserAddress('');
+            setProofHash(null);
+            setComplianceData(null);
+          }}
+          connectedAddress={userAddress}
         />
-        <p className="text-sm text-gray-600 mb-4">
-          Your trading data stays private. Only royalty compliance is revealed.
-        </p>
+        
         {userAddress && (
           <RoyaltyComplianceProof 
             userAddress={userAddress}
