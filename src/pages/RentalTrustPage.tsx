@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, TrendingUp, Lock, ShieldCheck, Sparkles, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { CheckCircle, TrendingUp, Lock, ShieldCheck, ArrowLeft, Play, Eye, Info, ShieldAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalTrustScore } from '../components/zk/RentalTrustScore';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -7,6 +7,7 @@ import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 import { DemoMode } from '../components/demo/DemoMode';
 import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
 import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
+import { Accordion } from '../components/ui/Accordion';
 
 export function RentalTrustPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -45,120 +46,146 @@ export function RentalTrustPage() {
         </div>
       </div>
 
-      {/* Demo Mode */}
-      <DemoMode
-        featureName="Rental Trust Score"
-        onStartDemo={() => setIsDemoRunning(true)}
-        isDemoRunning={isDemoRunning}
-      />
-
-      {/* Data Flow Visualization */}
-      <DataFlowVisualization featureName="Rental Trust Score" />
-
-      {/* Before/After Comparison */}
-      <BeforeAfterComparison
-        featureName="Rental Trust Score"
-        beforeData={[
-          'Complete rental history exposed',
-          'Specific properties rented visible',
-          'Rental timeline tracked',
-          'Landlord information revealed',
-          'Payment amounts shared'
-        ]}
-        afterData={[
-          'Only trust score range revealed',
-          'Property details stay private',
-          'Rental timeline protected',
-          'Landlord identity hidden',
-          'Payment amounts never shared'
-        ]}
-      />
-
-      {/* Privacy Visualization */}
-      <PrivacyVisualization
-        featureName="Rental Trust Score"
-        protectedData={[
-          'Individual rental transactions',
-          'Specific properties rented',
-          'Rental history timeline',
-          'Landlord information',
-          'Payment amounts'
-        ]}
-        exposedData={[
-          'Proof hash only',
-          'Trust score range (not exact)',
-          'Success rate percentage',
-          'Proof expiration date'
-        ]}
-        processSteps={[
-          'Your rental data stays on your device',
-          'We calculate trust score locally',
-          'Zero-knowledge proof is generated mathematically',
-          'Only the proof is shared - never your history',
-          'Marketplace verifies proof without seeing your rental transactions'
-        ]}
-      />
-
-      {/* Problems Solved */}
-      <ProblemsSolved
-        featureName="Rental Trust Score"
-        problems={[
-          {
-            title: "Privacy in Rental History",
-            description: "Proving rental reliability typically requires sharing complete rental history, including specific properties, landlords, and payment details, exposing sensitive personal information.",
-            severity: 'high'
-          },
-          {
-            title: "Trust Verification Friction",
-            description: "NFT rental platforms struggle to verify user reliability without access to off-chain rental history, creating trust barriers and requiring manual verification.",
-            severity: 'high'
-          },
-          {
-            title: "Cross-Platform Trust",
-            description: "Rental trust scores cannot be transferred between platforms without revealing the underlying rental transactions, forcing users to rebuild reputation on each platform.",
-            severity: 'medium'
-          },
-          {
-            title: "Rental Fraud",
-            description: "Without proper trust verification, malicious actors can damage NFT rentals through late returns, damage, or non-payment, harming the rental ecosystem.",
-            severity: 'high'
-          },
-          {
-            title: "Historical Data Exposure",
-            description: "Traditional verification requires exposing historical rental data that users may want to keep private for personal or competitive reasons.",
-            severity: 'medium'
-          }
-        ]}
-      />
-
-      {/* Wallet Input Section */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
-        <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-purple-600" />
-          XRPL Wallet Address
-        </label>
+      {/* Main Action Section - Prominent at Top */}
+      <div className="bg-gradient-to-br from-white to-teal-50 rounded-2xl shadow-2xl p-8 mb-6 border-2 border-teal-200">
+        <div className="flex items-center gap-2 mb-4">
+          <ShieldCheck className="w-5 h-5 text-teal-600" />
+          <label className="text-lg font-bold text-gray-900">Generate Your Proof</label>
+        </div>
         <input
           type="text"
           value={userAddress}
           onChange={(e) => setUserAddress(e.target.value)}
-          placeholder="r..."
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-lg"
+          placeholder="Enter XRPL wallet address (r...)"
+          className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-teal-500/30 focus:border-teal-500 transition-all duration-200 text-lg mb-3"
         />
-        <p className="text-sm text-gray-500 mt-2">
-          Enter your XRPL wallet address to generate a rental trust score proof
+        <p className="text-sm text-gray-600 mb-4">
+          Your rental history stays private. Only trust score is revealed.
         </p>
+        {userAddress && (
+          <RentalTrustScore
+            userAddress={userAddress}
+            onVerified={(hash, data) => {
+              setProofHash(hash);
+              setStats(data);
+            }}
+          />
+        )}
       </div>
 
-      {/* Rental Trust Score Component */}
-      {userAddress && (
-        <RentalTrustScore 
-          userAddress={userAddress}
-          onVerified={(hash, s) => {
-            setProofHash(hash);
-            setStats(s);
-          }}
-        />
-      )}
+      {/* Collapsible Educational Content */}
+      <div className="space-y-4">
+        <Accordion 
+          title="Interactive Demo" 
+          icon={<Play className="w-5 h-5 text-indigo-600" />}
+          defaultOpen={false}
+        >
+          <DemoMode
+            featureName="Rental Trust Score"
+            onStartDemo={() => setIsDemoRunning(true)}
+            isDemoRunning={isDemoRunning}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="How It Works" 
+          icon={<Eye className="w-5 h-5 text-purple-600" />}
+          defaultOpen={false}
+        >
+          <DataFlowVisualization featureName="Rental Trust Score" />
+        </Accordion>
+
+        <Accordion 
+          title="Privacy Comparison" 
+          icon={<Lock className="w-5 h-5 text-green-600" />}
+          defaultOpen={false}
+        >
+          <BeforeAfterComparison
+            featureName="Rental Trust Score"
+            beforeData={[
+              'Complete rental history exposed',
+              'Specific properties rented visible',
+              'Rental timeline tracked',
+              'Landlord information revealed',
+              'Payment amounts shared'
+            ]}
+            afterData={[
+              'Only trust score range revealed',
+              'Property details stay private',
+              'Rental timeline protected',
+              'Landlord identity hidden',
+              'Payment amounts never shared'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Protected Data Details" 
+          icon={<ShieldCheck className="w-5 h-5 text-blue-600" />}
+          defaultOpen={false}
+        >
+          <PrivacyVisualization
+            featureName="Rental Trust Score"
+            protectedData={[
+              'Individual rental transactions',
+              'Specific properties rented',
+              'Rental history timeline',
+              'Landlord information',
+              'Payment amounts'
+            ]}
+            exposedData={[
+              'Proof hash only',
+              'Trust score range (not exact)',
+              'Success rate percentage',
+              'Proof expiration date'
+            ]}
+            processSteps={[
+              'Your rental data stays on your device',
+              'We calculate trust score locally',
+              'Zero-knowledge proof is generated mathematically',
+              'Only the proof is shared - never your history',
+              'Marketplace verifies proof without seeing your rental transactions'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Problems Solved" 
+          icon={<Info className="w-5 h-5 text-orange-600" />}
+          defaultOpen={false}
+        >
+          <ProblemsSolved
+            featureName="Rental Trust Score"
+            problems={[
+              {
+                title: "Privacy in Rental History",
+                description: "Traditional rental verification requires sharing complete rental history, payment records, and landlord information, exposing sensitive personal and financial data.",
+                severity: 'high'
+              },
+              {
+                title: "Trust Verification Friction",
+                description: "Verifying rental trust across different platforms requires repeatedly submitting rental history and references, creating friction and privacy risks.",
+                severity: 'medium'
+              },
+              {
+                title: "Cross-Platform Trust",
+                description: "Rental trust scores are platform-specific, requiring users to rebuild trust on each platform and share rental data multiple times.",
+                severity: 'medium'
+              },
+              {
+                title: "Rental Fraud",
+                description: "Without proper trust verification, rental platforms are vulnerable to fraud from users with poor rental history or payment issues.",
+                severity: 'high'
+              },
+              {
+                title: "Historical Data Exposure",
+                description: "Rental verification often reveals historical payment patterns, property preferences, and landlord relationships that users prefer to keep private.",
+                severity: 'high'
+              }
+            ]}
+          />
+        </Accordion>
+      </div>
 
       {/* Success State with Magic Moment */}
       {proofHash && stats && (

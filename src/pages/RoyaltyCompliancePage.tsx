@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Heart, Lock, ArrowLeft, ShieldAlert, TrendingUp, Coins } from 'lucide-react';
+import { CheckCircle, Heart, Lock, ArrowLeft, ShieldAlert, TrendingUp, Coins, Play, Eye, Shield, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RoyaltyComplianceProof } from '../components/zk/RoyaltyComplianceProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -7,6 +7,7 @@ import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 import { DemoMode } from '../components/demo/DemoMode';
 import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
 import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
+import { Accordion } from '../components/ui/Accordion';
 
 export function RoyaltyCompliancePage() {
   const [userAddress, setUserAddress] = useState('');
@@ -45,125 +46,151 @@ export function RoyaltyCompliancePage() {
         </div>
       </div>
 
-      {/* Demo Mode */}
-      <DemoMode
-        featureName="Royalty Compliance"
-        onStartDemo={() => setIsDemoRunning(true)}
-        isDemoRunning={isDemoRunning}
-      />
-
-      {/* Data Flow Visualization */}
-      <DataFlowVisualization featureName="Royalty Compliance" />
-
-      {/* Before/After Comparison */}
-      <BeforeAfterComparison
-        featureName="Royalty Compliance"
-        beforeData={[
-          'Full transaction history exposed',
-          'Counterparty identities revealed',
-          'Specific NFTs traded visible',
-          'Trading patterns analyzed',
-          'Portfolio composition shared'
-        ]}
-        afterData={[
-          'Only compliance status revealed',
-          'Counterparties remain anonymous',
-          'NFT trades stay private',
-          'Trading patterns hidden',
-          'Portfolio composition protected'
-        ]}
-      />
-
-      {/* Privacy Visualization */}
-      <PrivacyVisualization
-        featureName="Royalty Compliance"
-        protectedData={[
-          'Transaction amounts',
-          'Counterparties',
-          'Specific NFTs traded',
-          'Trading patterns',
-          'Portfolio composition'
-        ]}
-        exposedData={[
-          'Proof hash only',
-          'Compliance status (yes/no)',
-          'Royalty rate percentage',
-          'Proof expiration date'
-        ]}
-        processSteps={[
-          'Your transaction data stays on your device',
-          'We check royalty compliance locally (100% royalty rate)',
-          'Zero-knowledge proof is generated mathematically',
-          'Only the proof is shared - never your trades',
-          'Marketplace verifies proof without seeing your transaction history'
-        ]}
-      />
-
-      {/* Problems Solved */}
-      <ProblemsSolved
-        featureName="Royalty Compliance"
-        problems={[
-          {
-            title: "Creator Underpayment",
-            description: "NFT traders often bypass royalty payments by trading on marketplaces that don't enforce creator royalties, depriving artists of their rightful earnings.",
-            severity: 'high'
-          },
-          {
-            title: "Trading Privacy Concerns",
-            description: "Proving royalty compliance typically requires revealing entire transaction history, exposing trading patterns, counterparties, and portfolio composition.",
-            severity: 'high'
-          },
-          {
-            title: "Marketplace Fragmentation",
-            description: "Different marketplaces have different royalty enforcement policies, making it difficult for creators to track compliance across platforms.",
-            severity: 'medium'
-          },
-          {
-            title: "Wash Trading Detection",
-            description: "Without proper verification, wash traders can artificially inflate trading volumes while avoiding royalty payments, manipulating market metrics.",
-            severity: 'high'
-          },
-          {
-            title: "Cross-Platform Tracking",
-            description: "Creators cannot easily verify if a trader consistently pays royalties across all marketplaces without accessing private trading data.",
-            severity: 'medium'
-          }
-        ]}
-      />
-
-      {/* Wallet Input Section */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
-        <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <Coins className="w-4 h-4 text-red-600" />
-          XRPL Wallet Address
-        </label>
+      {/* Main Action Section - Prominent at Top */}
+      <div className="bg-gradient-to-br from-white to-red-50 rounded-2xl shadow-2xl p-8 mb-6 border-2 border-red-200">
+        <div className="flex items-center gap-2 mb-4">
+          <Coins className="w-5 h-5 text-red-600" />
+          <label className="text-lg font-bold text-gray-900">Generate Your Proof</label>
+        </div>
         <input
           type="text"
           value={userAddress}
           onChange={(e) => setUserAddress(e.target.value)}
-          placeholder="r..."
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-lg"
+          placeholder="Enter XRPL wallet address (r...)"
+          className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-red-500/30 focus:border-red-500 transition-all duration-200 text-lg mb-3"
         />
-        <p className="text-sm text-gray-500 mt-2">
-          Enter your XRPL wallet address to generate a royalty compliance proof
+        <p className="text-sm text-gray-600 mb-4">
+          Your trading data stays private. Only royalty compliance is revealed.
         </p>
+        {userAddress && (
+          <RoyaltyComplianceProof 
+            userAddress={userAddress}
+            proofHash={proofHash || undefined}
+            onVerified={(hash, data) => {
+              setProofHash(hash);
+              setComplianceData(data);
+            }}
+            onRegenerate={() => {
+              setProofHash(null);
+              setComplianceData(null);
+            }}
+          />
+        )}
       </div>
 
-      {/* Royalty Compliance Proof Component */}
-      {userAddress && (
-        <RoyaltyComplianceProof 
-          userAddress={userAddress}
-          proofHash={proofHash || undefined}
-          onVerified={(hash, data) => {
-            setProofHash(hash);
-            setComplianceData(data);
-          }}
-          onRegenerate={() => {
-            setProofHash(null);
-            setComplianceData(null);
-          }}
-        />
-      )}
+      {/* Collapsible Educational Content */}
+      <div className="space-y-4">
+        <Accordion 
+          title="Interactive Demo" 
+          icon={<Play className="w-5 h-5 text-indigo-600" />}
+          defaultOpen={false}
+        >
+          <DemoMode
+            featureName="Royalty Compliance"
+            onStartDemo={() => setIsDemoRunning(true)}
+            isDemoRunning={isDemoRunning}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="How It Works" 
+          icon={<Eye className="w-5 h-5 text-purple-600" />}
+          defaultOpen={false}
+        >
+          <DataFlowVisualization featureName="Royalty Compliance" />
+        </Accordion>
+
+        <Accordion 
+          title="Privacy Comparison" 
+          icon={<Shield className="w-5 h-5 text-green-600" />}
+          defaultOpen={false}
+        >
+          <BeforeAfterComparison
+            featureName="Royalty Compliance"
+            beforeData={[
+              'Full transaction history exposed',
+              'Counterparty identities revealed',
+              'Specific NFTs traded visible',
+              'Trading patterns analyzed',
+              'Portfolio composition shared'
+            ]}
+            afterData={[
+              'Only compliance status revealed',
+              'Counterparties remain anonymous',
+              'NFT trades stay private',
+              'Trading patterns hidden',
+              'Portfolio composition protected'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Protected Data Details" 
+          icon={<Lock className="w-5 h-5 text-blue-600" />}
+          defaultOpen={false}
+        >
+          <PrivacyVisualization
+            featureName="Royalty Compliance"
+            protectedData={[
+              'Transaction amounts',
+              'Counterparties',
+              'Specific NFTs traded',
+              'Trading patterns',
+              'Portfolio composition'
+            ]}
+            exposedData={[
+              'Proof hash only',
+              'Compliance status (yes/no)',
+              'Royalty rate percentage',
+              'Proof expiration date'
+            ]}
+            processSteps={[
+              'Your transaction data stays on your device',
+              'We check royalty compliance locally (100% royalty rate)',
+              'Zero-knowledge proof is generated mathematically',
+              'Only the proof is shared - never your trades',
+              'Marketplace verifies proof without seeing your transaction history'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Problems Solved" 
+          icon={<Info className="w-5 h-5 text-orange-600" />}
+          defaultOpen={false}
+        >
+          <ProblemsSolved
+            featureName="Royalty Compliance"
+            problems={[
+              {
+                title: "Creator Underpayment",
+                description: "NFT creators often lose revenue when marketplaces don't enforce royalty payments, especially on secondary markets where royalty enforcement is optional.",
+                severity: 'high'
+              },
+              {
+                title: "Trading Privacy Concerns",
+                description: "Royalty compliance verification typically requires revealing complete transaction history and trading patterns, exposing sensitive financial information to third parties.",
+                severity: 'high'
+              },
+              {
+                title: "Marketplace Fragmentation",
+                description: "Different marketplaces have different royalty policies, making it difficult for creators to track and enforce royalty payments across all platforms.",
+                severity: 'medium'
+              },
+              {
+                title: "Wash Trading Detection",
+                description: "Marketplaces need to detect wash trading to ensure fair royalty distribution, but traditional methods require analyzing complete trading histories.",
+                severity: 'high'
+              },
+              {
+                title: "Cross-Platform Tracking",
+                description: "Tracking royalty compliance across multiple marketplaces requires sharing user data between platforms, creating privacy risks and data silos.",
+                severity: 'medium'
+              }
+            ]}
+          />
+        </Accordion>
+      </div>
 
       {/* Success State with Magic Moment */}
       {proofHash && complianceData && (

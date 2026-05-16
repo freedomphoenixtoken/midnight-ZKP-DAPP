@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Gift, Lock, ArrowLeft, ShieldAlert, Clock, Wallet } from 'lucide-react';
+import { CheckCircle, Gift, Lock, ArrowLeft, ShieldAlert, Clock, Wallet, Play, Eye, Shield, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AirdropEligibilityProof } from '../components/zk/AirdropEligibilityProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -7,6 +7,7 @@ import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 import { DemoMode } from '../components/demo/DemoMode';
 import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
 import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
+import { Accordion } from '../components/ui/Accordion';
 
 export function AirdropEligibilityPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -45,124 +46,151 @@ export function AirdropEligibilityPage() {
         </div>
       </div>
 
-      {/* Demo Mode */}
-      <DemoMode
-        featureName="Airdrop Eligibility"
-        onStartDemo={() => setIsDemoRunning(true)}
-        isDemoRunning={isDemoRunning}
-      />
-
-      {/* Data Flow Visualization */}
-      <DataFlowVisualization featureName="Airdrop Eligibility" />
-
-      {/* Before/After Comparison */}
-      <BeforeAfterComparison
-        featureName="Airdrop Eligibility"
-        beforeData={[
-          'Full wallet balance exposed',
-          'Complete transaction history shared',
-          'NFT holdings visible to all',
-          'IP address tracked',
-          'Personal identity linked to wallet'
-        ]}
-        afterData={[
-          'Only eligibility status revealed',
-          'Proof hash shared (no data)',
-          'NFT holdings remain private',
-          'IP address never collected',
-          'Identity never linked to proof'
-        ]}
-      />
-
-      {/* Privacy Visualization */}
-      <PrivacyVisualization
-        featureName="Airdrop Eligibility"
-        protectedData={[
-          'Wallet balance',
-          'Transaction history',
-          'NFT holdings',
-          'Personal identity',
-          'IP address'
-        ]}
-        exposedData={[
-          'Proof hash only',
-          'Eligibility status (yes/no)',
-          'Proof expiration date'
-        ]}
-        processSteps={[
-          'Your wallet data stays on your device',
-          'We check eligibility criteria locally (30+ days, 5+ txns, holds XRP)',
-          'Zero-knowledge proof is generated mathematically',
-          'Only the proof is shared - never your data',
-          'Marketplace verifies proof without seeing your wallet'
-        ]}
-      />
-
-      {/* Problems Solved */}
-      <ProblemsSolved
-        featureName="Airdrop Eligibility"
-        problems={[
-          {
-            title: "Sybil Attack Vulnerability",
-            description: "Traditional airdrops are vulnerable to sybil attacks where users create multiple wallets to claim rewards multiple times, devaluing the airdrop for genuine users.",
-            severity: 'high'
-          },
-          {
-            title: "Privacy Invasion",
-            description: "Airdrop eligibility checks often require users to reveal their wallet balance, transaction history, and holdings to prove they're legitimate users, exposing sensitive financial data.",
-            severity: 'high'
-          },
-          {
-            title: "Centralized Verification",
-            description: "Most airdrop eligibility is verified by centralized servers that collect user data, creating privacy risks and single points of failure.",
-            severity: 'medium'
-          },
-          {
-            title: "Cross-Chain Incompatibility",
-            description: "Airdrops are often limited to specific chains, forcing users to bridge funds and reveal cross-chain transaction history.",
-            severity: 'medium'
-          },
-          {
-            title: "Fair Distribution Issues",
-            description: "Without proper eligibility verification, airdrops may be claimed by bots and wash traders instead of genuine community members.",
-            severity: 'high'
-          }
-        ]}
-      />
-
-      {/* Wallet Input Section */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
-        <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <Wallet className="w-4 h-4 text-orange-600" />
-          XRPL Wallet Address
-        </label>
+      {/* Main Action Section - Prominent at Top */}
+      <div className="bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-2xl p-8 mb-6 border-2 border-orange-200">
+        <div className="flex items-center gap-2 mb-4">
+          <Wallet className="w-5 h-5 text-orange-600" />
+          <label className="text-lg font-bold text-gray-900">Generate Your Proof</label>
+        </div>
         <input
           type="text"
           value={userAddress}
           onChange={(e) => setUserAddress(e.target.value)}
-          placeholder="r..."
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 text-lg"
+          placeholder="Enter XRPL wallet address (r...)"
+          className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-orange-500/30 focus:border-orange-500 transition-all duration-200 text-lg mb-3"
         />
-        <p className="text-sm text-gray-500 mt-2">
-          Enter your XRPL wallet address to generate an airdrop eligibility proof
+        <p className="text-sm text-gray-600 mb-4">
+          Your data stays on your device. Only a mathematical proof is shared.
         </p>
+        {userAddress && (
+          <AirdropEligibilityProof 
+            userAddress={userAddress}
+            proofHash={proofHash || undefined}
+            onVerified={(hash, data) => {
+              setProofHash(hash);
+              setEligibilityData(data);
+            }}
+            onRegenerate={() => {
+              setProofHash(null);
+              setEligibilityData(null);
+            }}
+          />
+        )}
       </div>
 
-      {/* Airdrop Eligibility Proof Component */}
-      {userAddress && (
-        <AirdropEligibilityProof 
-          userAddress={userAddress}
-          proofHash={proofHash || undefined}
-          onVerified={(hash, data) => {
-            setProofHash(hash);
-            setEligibilityData(data);
-          }}
-          onRegenerate={() => {
-            setProofHash(null);
-            setEligibilityData(null);
-          }}
-        />
-      )}
+      {/* Collapsible Educational Content */}
+      <div className="space-y-4">
+        <Accordion 
+          title="Interactive Demo" 
+          icon={<Play className="w-5 h-5 text-indigo-600" />}
+          defaultOpen={false}
+        >
+          <DemoMode
+            featureName="Airdrop Eligibility"
+            onStartDemo={() => setIsDemoRunning(true)}
+            isDemoRunning={isDemoRunning}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="How It Works" 
+          icon={<Eye className="w-5 h-5 text-purple-600" />}
+          defaultOpen={false}
+        >
+          <DataFlowVisualization featureName="Airdrop Eligibility" />
+        </Accordion>
+
+        <Accordion 
+          title="Privacy Comparison" 
+          icon={<Shield className="w-5 h-5 text-green-600" />}
+          defaultOpen={false}
+        >
+          <BeforeAfterComparison
+            featureName="Airdrop Eligibility"
+            beforeData={[
+              'Full wallet balance exposed',
+              'Complete transaction history shared',
+              'NFT holdings visible to all',
+              'IP address tracked',
+              'Personal identity linked to wallet'
+            ]}
+            afterData={[
+              'Only eligibility status revealed',
+              'Proof hash shared (no data)',
+              'NFT holdings remain private',
+              'IP address never collected',
+              'Identity never linked to proof'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Protected Data Details" 
+          icon={<Lock className="w-5 h-5 text-blue-600" />}
+          defaultOpen={false}
+        >
+          <PrivacyVisualization
+            featureName="Airdrop Eligibility"
+            protectedData={[
+              'Wallet balance',
+              'Transaction history',
+              'NFT holdings',
+              'Personal identity',
+              'IP address'
+            ]}
+            exposedData={[
+              'Proof hash only',
+              'Eligibility status (yes/no)',
+              'Proof expiration date'
+            ]}
+            processSteps={[
+              'Your wallet data stays on your device',
+              'We check eligibility criteria locally (30+ days, 5+ txns, holds XRP)',
+              'Zero-knowledge proof is generated mathematically',
+              'Only the proof is shared - never your data',
+              'Marketplace verifies proof without seeing your wallet'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Problems Solved" 
+          icon={<Info className="w-5 h-5 text-orange-600" />}
+          defaultOpen={false}
+        >
+          <ProblemsSolved
+            featureName="Airdrop Eligibility"
+            problems={[
+              {
+                title: "Sybil Attack Vulnerability",
+                description: "Traditional airdrops are vulnerable to sybil attacks where users create multiple wallets to claim rewards multiple times, devaluing the airdrop for genuine users.",
+                severity: 'high'
+              },
+              {
+                title: "Privacy Invasion",
+                description: "Airdrop eligibility checks often require users to reveal their wallet balance, transaction history, and holdings to prove they're legitimate users, exposing sensitive financial data.",
+                severity: 'high'
+              },
+              {
+                title: "Centralized Verification",
+                description: "Most airdrop eligibility is verified by centralized servers that collect user data, creating privacy risks and single points of failure.",
+                severity: 'medium'
+              },
+              {
+                title: "Cross-Chain Incompatibility",
+                description: "Airdrops are often limited to specific chains, forcing users to bridge funds and reveal cross-chain transaction history.",
+                severity: 'medium'
+              },
+              {
+                title: "Fair Distribution Issues",
+                description: "Without proper eligibility verification, airdrops may be claimed by bots and wash traders instead of genuine community members.",
+                severity: 'high'
+              }
+            ]}
+          />
+        </Accordion>
+      </div>
+
 
       {/* Success State with Magic Moment */}
       {proofHash && eligibilityData && (

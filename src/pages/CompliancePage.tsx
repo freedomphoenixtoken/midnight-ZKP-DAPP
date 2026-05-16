@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Lock, Shield, Sparkles, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Lock, Shield, ArrowLeft, Play, Eye, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CompliancePassport } from '../components/zk/CompliancePassport';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -7,6 +7,7 @@ import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 import { DemoMode } from '../components/demo/DemoMode';
 import { DataFlowVisualization } from '../components/visualization/DataFlowVisualization';
 import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
+import { Accordion } from '../components/ui/Accordion';
 
 export function CompliancePage() {
   const [userAddress, setUserAddress] = useState('');
@@ -44,117 +45,145 @@ export function CompliancePage() {
         </div>
       </div>
 
-      {/* Demo Mode */}
-      <DemoMode
-        featureName="Compliance Passport"
-        onStartDemo={() => setIsDemoRunning(true)}
-        isDemoRunning={isDemoRunning}
-      />
-
-      {/* Data Flow Visualization */}
-      <DataFlowVisualization featureName="Compliance Passport" />
-
-      {/* Before/After Comparison */}
-      <BeforeAfterComparison
-        featureName="Compliance Passport"
-        beforeData={[
-          'Full identity documents shared',
-          'KYC details exposed to all',
-          'Accreditation details revealed',
-          'Financial information visible',
-          'Government ID numbers stored'
-        ]}
-        afterData={[
-          'Only compliance status revealed',
-          'KYC details remain private',
-          'Accreditation status only',
-          'Financial information protected',
-          'ID numbers never stored'
-        ]}
-      />
-
-      {/* Privacy Visualization */}
-      <PrivacyVisualization
-        featureName="Compliance Passport"
-        protectedData={[
-          'Personal identity (name, DOB)',
-          'KYC documents',
-          'Accreditation details',
-          'Financial information',
-          'Government ID numbers'
-        ]}
-        exposedData={[
-          'Proof hash only',
-          'Compliance status (yes/no)',
-          'Compliance type (KYC/Accredited)',
-          'Proof expiration date'
-        ]}
-        processSteps={[
-          'Your KYC data stays on your device',
-          'We verify compliance status locally',
-          'Zero-knowledge proof is generated mathematically',
-          'Only the proof is shared - never your identity',
-          'Marketplace verifies proof without seeing your personal data'
-        ]}
-      />
-
-      {/* Problems Solved */}
-      <ProblemsSolved
-        featureName="Compliance Passport"
-        problems={[
-          {
-            title: "Identity Exposure",
-            description: "Traditional KYC requires users to repeatedly submit personal identity documents to every platform, exposing sensitive data to multiple third parties and increasing identity theft risk.",
-            severity: 'high'
-          },
-          {
-            title: "Centralized Data Silos",
-            description: "Compliance data is stored in centralized databases that are vulnerable to breaches, leaks, and unauthorized access, putting millions of users' personal information at risk.",
-            severity: 'high'
-          },
-          {
-            title: "Repeated Verification",
-            description: "Users must undergo KYC processes on every platform they use, creating friction and requiring them to share the same personal information repeatedly.",
-            severity: 'medium'
-          },
-          {
-            title: "RWA Access Barriers",
-            description: "Real World Asset (RWA) purchases require accreditation verification, but proving status without revealing financial details creates privacy concerns for high-net-worth individuals.",
-            severity: 'high'
-          },
-          {
-            title: "Cross-Platform Compliance",
-            description: "Compliance status cannot be easily transferred between platforms without exposing the underlying verification data, forcing users to repeat the process.",
-            severity: 'medium'
-          }
-        ]}
-      />
-
-      {/* Wallet Input Section */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
-        <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-blue-600" />
-          XRPL Wallet Address
-        </label>
+      {/* Main Action Section - Prominent at Top */}
+      <div className="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-2xl p-8 mb-6 border-2 border-blue-200">
+        <div className="flex items-center gap-2 mb-4">
+          <Shield className="w-5 h-5 text-blue-600" />
+          <label className="text-lg font-bold text-gray-900">Generate Your Proof</label>
+        </div>
         <input
           type="text"
           value={userAddress}
           onChange={(e) => setUserAddress(e.target.value)}
-          placeholder="r..."
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-lg"
+          placeholder="Enter XRPL wallet address (r...)"
+          className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-200 text-lg mb-3"
         />
-        <p className="text-sm text-gray-500 mt-2">
-          Enter your XRPL wallet address to generate a compliance proof
+        <p className="text-sm text-gray-600 mb-4">
+          Your identity documents stay private. Only compliance status is revealed.
         </p>
+        {userAddress && (
+          <CompliancePassport
+            userAddress={userAddress}
+            onVerified={(hash) => {
+              setProofHash(hash);
+            }}
+          />
+        )}
       </div>
 
-      {/* Compliance Passport Component */}
-      {userAddress && (
-        <CompliancePassport 
-          userAddress={userAddress}
-          onVerified={setProofHash}
-        />
-      )}
+      {/* Collapsible Educational Content */}
+      <div className="space-y-4">
+        <Accordion 
+          title="Interactive Demo" 
+          icon={<Play className="w-5 h-5 text-indigo-600" />}
+          defaultOpen={false}
+        >
+          <DemoMode
+            featureName="Compliance Passport"
+            onStartDemo={() => setIsDemoRunning(true)}
+            isDemoRunning={isDemoRunning}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="How It Works" 
+          icon={<Eye className="w-5 h-5 text-purple-600" />}
+          defaultOpen={false}
+        >
+          <DataFlowVisualization featureName="Compliance Passport" />
+        </Accordion>
+
+        <Accordion 
+          title="Privacy Comparison" 
+          icon={<Lock className="w-5 h-5 text-green-600" />}
+          defaultOpen={false}
+        >
+          <BeforeAfterComparison
+            featureName="Compliance Passport"
+            beforeData={[
+              'Full identity documents shared',
+              'KYC details exposed to all',
+              'Accreditation details revealed',
+              'Financial information visible',
+              'Government ID numbers stored'
+            ]}
+            afterData={[
+              'Only compliance status revealed',
+              'KYC details remain private',
+              'Accreditation status only',
+              'Financial information protected',
+              'ID numbers never stored'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Protected Data Details" 
+          icon={<Shield className="w-5 h-5 text-blue-600" />}
+          defaultOpen={false}
+        >
+          <PrivacyVisualization
+            featureName="Compliance Passport"
+            protectedData={[
+              'Personal identity (name, DOB)',
+              'KYC documents',
+              'Accreditation details',
+              'Financial information',
+              'Government ID numbers'
+            ]}
+            exposedData={[
+              'Proof hash only',
+              'Compliance status (yes/no)',
+              'Compliance type (KYC/Accredited)',
+              'Proof expiration date'
+            ]}
+            processSteps={[
+              'Your KYC data stays on your device',
+              'We verify compliance status locally',
+              'Zero-knowledge proof is generated mathematically',
+              'Only the proof is shared - never your identity',
+              'Marketplace verifies proof without seeing your personal data'
+            ]}
+          />
+        </Accordion>
+
+        <Accordion 
+          title="Problems Solved" 
+          icon={<Info className="w-5 h-5 text-orange-600" />}
+          defaultOpen={false}
+        >
+          <ProblemsSolved
+            featureName="Compliance Passport"
+            problems={[
+              {
+                title: "Identity Exposure",
+                description: "Traditional compliance verification requires sharing complete identity documents, KYC data, and government IDs with every platform, creating massive privacy risks and data breaches.",
+                severity: 'high'
+              },
+              {
+                title: "Centralized Data Silos",
+                description: "Compliance data is stored in centralized databases that become honeypots for hackers, with single points of failure and no user control over personal information.",
+                severity: 'high'
+              },
+              {
+                title: "Repeated Verification",
+                description: "Users must repeatedly submit KYC documents and personal information to every platform, creating friction and exposing the same data multiple times.",
+                severity: 'medium'
+              },
+              {
+                title: "RWA Access Barriers",
+                description: "Real World Asset (RWA) marketplaces require extensive compliance verification, but traditional methods expose sensitive financial and identity data to third parties.",
+                severity: 'high'
+              },
+              {
+                title: "Cross-Platform Compliance",
+                description: "Verifying compliance across multiple platforms requires sharing personal data between services, creating privacy risks and regulatory complexity.",
+                severity: 'medium'
+              }
+            ]}
+          />
+        </Accordion>
+      </div>
 
       {/* Success State with Magic Moment */}
       {proofHash && (
