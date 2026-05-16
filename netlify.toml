@@ -7,8 +7,18 @@
   node_bundler = "esbuild"
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
+  from = "/api/zk/generate-compliance-proof"
+  to = "/.netlify/functions/generate-compliance-proof"
+  status = 200
+
+[[redirects]]
+  from = "/api/zk/generate-rental-trust-proof"
+  to = "/.netlify/functions/generate-rental-trust-proof"
+  status = 200
+
+[[redirects]]
+  from = "/api/zk/verify-proof"
+  to = "/.netlify/functions/verify-proof"
   status = 200
 
 [[redirects]]

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:functions": "tsc --project tsconfig.node.json",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:zk": "tsx scripts/test-zk-integration.ts",
