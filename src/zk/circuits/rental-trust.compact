@@ -1,0 +1,35 @@
+pragma language_version >= 0.23;
+
+// Public outputs
+export public output trust_score_valid: bool;
+export public output success_rate: u64;
+export public output ontime_rate: u64;
+
+// Private inputs
+export circuit verifyRentalTrust(
+    userDid: Opaque<"string">,
+    totalRentals: Opaque<"u64">,
+    successfulRentals: Opaque<"u64">,
+    onTimeReturns: Opaque<"u64">,
+    lastRentalTimestamp: Opaque<"u64">
+): [] {
+    // Verify minimum rental history (at least 3 rentals)
+    require(totalRentals >= 3);
+    
+    // Calculate and verify success rate >= 80%
+    success_rate = (successfulRentals * 100) / totalRentals;
+    require(success_rate >= 80);
+    
+    // Calculate and verify on-time return rate >= 90%
+    ontime_rate = (onTimeReturns * 100) / totalRentals;
+    require(ontime_rate >= 90);
+    
+    // Verify active user (rental within 6 months = 15768000 seconds)
+    current_time = builtin::get_timestamp();
+    require(current_time - lastRentalTimestamp < 15768000);
+    
+    // Set public outputs
+    trust_score_valid = disclose(true);
+    success_rate = disclose(success_rate);
+    ontime_rate = disclose(ontime_rate);
+}
