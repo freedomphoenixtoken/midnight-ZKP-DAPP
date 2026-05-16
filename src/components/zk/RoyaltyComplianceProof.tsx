@@ -1,15 +1,28 @@
 import { useState } from 'react';
-import { Heart, AlertCircle, Loader2, Sparkles, CheckCircle2, Eye, TrendingUp, Coins } from 'lucide-react';
+import { Heart, AlertCircle, Loader2, Sparkles, CheckCircle2, Eye, TrendingUp, Coins, Twitter, Link as LinkIcon } from 'lucide-react';
 
 interface RoyaltyComplianceProofProps {
   userAddress: string;
   onVerified: (hash: string, data: any) => void;
+  proofHash?: string;
 }
 
-export function RoyaltyComplianceProof({ userAddress, onVerified }: RoyaltyComplianceProofProps) {
+export function RoyaltyComplianceProof({ userAddress, onVerified, proofHash }: RoyaltyComplianceProofProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generationStep, setGenerationStep] = useState(0);
+
+  const shareOnTwitter = () => {
+    if (!proofHash) return;
+    const text = `I just generated a ZK-Royalty Compliance proof without revealing my transaction details! 🔐 Creator-friendly trading with privacy. #ZeroKnowledge #MidnightNetwork #NFTs`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const copyProofHash = () => {
+    if (!proofHash) return;
+    navigator.clipboard.writeText(proofHash);
+  };
 
   const generateProof = async () => {
     setIsGenerating(true);
@@ -166,6 +179,38 @@ export function RoyaltyComplianceProof({ userAddress, onVerified }: RoyaltyCompl
                 Try Again
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {proofHash && !isGenerating && !error && (
+        <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <CheckCircle2 className="w-8 h-8 text-green-600" />
+            <div>
+              <h4 className="font-bold text-green-900 text-lg">Proof Generated Successfully!</h4>
+              <p className="text-sm text-green-700">Your royalty compliance is verified</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-3 mb-4">
+            <div className="text-xs text-gray-500 mb-1">Proof Hash</div>
+            <div className="font-mono text-sm text-gray-900 break-all">{proofHash}</div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={shareOnTwitter}
+              className="flex-1 flex items-center justify-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <Twitter className="w-4 h-4" />
+              Share on X
+            </button>
+            <button
+              onClick={copyProofHash}
+              className="flex-1 flex items-center justify-center gap-2 bg-gray-200 text-gray-900 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              <LinkIcon className="w-4 h-4" />
+              Copy Hash
+            </button>
           </div>
         </div>
       )}

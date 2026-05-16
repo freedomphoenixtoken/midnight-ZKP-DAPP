@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { CheckCircle, Gift, Lock, ArrowLeft, Eye, ShieldAlert, Clock, Wallet } from 'lucide-react';
+import { CheckCircle, Gift, Lock, ArrowLeft, ShieldAlert, Clock, Wallet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AirdropEligibilityProof } from '../components/zk/AirdropEligibilityProof';
+import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 
 export function AirdropEligibilityPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -40,21 +41,28 @@ export function AirdropEligibilityPage() {
       </div>
 
       {/* Privacy Visualization */}
-      <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl p-6 mb-8 border border-orange-100">
-        <div className="flex items-start gap-4">
-          <div className="bg-white p-3 rounded-xl shadow-sm">
-            <Eye className="w-6 h-6 text-orange-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">How It Works</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              We generate a zero-knowledge proof that verifies you're a legitimate active user 
-              (wallet exists for 30+ days, 5+ transactions, holds &gt;0.01 XRP) without ever revealing 
-              your balance, transaction history, or which NFTs you own.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PrivacyVisualization
+        featureName="Airdrop Eligibility"
+        protectedData={[
+          'Wallet balance',
+          'Transaction history',
+          'NFT holdings',
+          'Personal identity',
+          'IP address'
+        ]}
+        exposedData={[
+          'Proof hash only',
+          'Eligibility status (yes/no)',
+          'Proof expiration date'
+        ]}
+        processSteps={[
+          'Your wallet data stays on your device',
+          'We check eligibility criteria locally (30+ days, 5+ txns, holds XRP)',
+          'Zero-knowledge proof is generated mathematically',
+          'Only the proof is shared - never your data',
+          'Marketplace verifies proof without seeing your wallet'
+        ]}
+      />
 
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
@@ -78,6 +86,7 @@ export function AirdropEligibilityPage() {
       {userAddress && (
         <AirdropEligibilityProof 
           userAddress={userAddress}
+          proofHash={proofHash || undefined}
           onVerified={(hash, data) => {
             setProofHash(hash);
             setEligibilityData(data);

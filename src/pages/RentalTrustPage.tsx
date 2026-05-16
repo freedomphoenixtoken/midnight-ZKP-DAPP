@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { CheckCircle, TrendingUp, Lock, ShieldCheck, Sparkles, ArrowLeft, Eye, ShieldAlert } from 'lucide-react';
+import { CheckCircle, TrendingUp, Lock, ShieldCheck, Sparkles, ArrowLeft, ShieldAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RentalTrustScore } from '../components/zk/RentalTrustScore';
+import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 
 export function RentalTrustPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -40,20 +41,29 @@ export function RentalTrustPage() {
       </div>
 
       {/* Privacy Visualization */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-8 border border-purple-100">
-        <div className="flex items-start gap-4">
-          <div className="bg-white p-3 rounded-xl shadow-sm">
-            <Eye className="w-6 h-6 text-purple-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">How It Works</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              We calculate your trust score from rental history and generate a zero-knowledge proof. 
-              Only your trust score is revealed, not the individual rental transactions or history.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PrivacyVisualization
+        featureName="Rental Trust Score"
+        protectedData={[
+          'Individual rental transactions',
+          'Specific properties rented',
+          'Rental history timeline',
+          'Landlord information',
+          'Payment amounts'
+        ]}
+        exposedData={[
+          'Proof hash only',
+          'Trust score range (not exact)',
+          'Success rate percentage',
+          'Proof expiration date'
+        ]}
+        processSteps={[
+          'Your rental data stays on your device',
+          'We calculate trust score locally',
+          'Zero-knowledge proof is generated mathematically',
+          'Only the proof is shared - never your history',
+          'Marketplace verifies proof without seeing your rental transactions'
+        ]}
+      />
 
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">

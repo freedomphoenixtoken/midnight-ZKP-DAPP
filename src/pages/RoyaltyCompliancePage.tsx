@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { CheckCircle, Heart, Lock, ArrowLeft, Eye, ShieldAlert, TrendingUp, Coins } from 'lucide-react';
+import { CheckCircle, Heart, Lock, ArrowLeft, ShieldAlert, TrendingUp, Coins } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RoyaltyComplianceProof } from '../components/zk/RoyaltyComplianceProof';
+import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 
 export function RoyaltyCompliancePage() {
   const [userAddress, setUserAddress] = useState('');
@@ -40,20 +41,29 @@ export function RoyaltyCompliancePage() {
       </div>
 
       {/* Privacy Visualization */}
-      <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 mb-8 border border-red-100">
-        <div className="flex items-start gap-4">
-          <div className="bg-white p-3 rounded-xl shadow-sm">
-            <Eye className="w-6 h-6 text-red-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">How It Works</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              We generate a zero-knowledge proof that verifies you've paid royalties on your NFT transactions 
-              without revealing transaction amounts, counterparties, or specific NFTs traded.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PrivacyVisualization
+        featureName="Royalty Compliance"
+        protectedData={[
+          'Transaction amounts',
+          'Counterparties',
+          'Specific NFTs traded',
+          'Trading patterns',
+          'Portfolio composition'
+        ]}
+        exposedData={[
+          'Proof hash only',
+          'Compliance status (yes/no)',
+          'Royalty rate percentage',
+          'Proof expiration date'
+        ]}
+        processSteps={[
+          'Your transaction data stays on your device',
+          'We check royalty compliance locally (100% royalty rate)',
+          'Zero-knowledge proof is generated mathematically',
+          'Only the proof is shared - never your trades',
+          'Marketplace verifies proof without seeing your transaction history'
+        ]}
+      />
 
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
@@ -77,6 +87,7 @@ export function RoyaltyCompliancePage() {
       {userAddress && (
         <RoyaltyComplianceProof 
           userAddress={userAddress}
+          proofHash={proofHash || undefined}
           onVerified={(hash, data) => {
             setProofHash(hash);
             setComplianceData(data);

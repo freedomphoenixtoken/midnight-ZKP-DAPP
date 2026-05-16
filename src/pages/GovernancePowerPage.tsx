@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { CheckCircle, Vote, Lock, ArrowLeft, Eye, ShieldAlert, Users, Crown } from 'lucide-react';
+import { CheckCircle, Vote, Lock, ArrowLeft, ShieldAlert, Users, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GovernancePowerProof } from '../components/zk/GovernancePowerProof';
+import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 
 export function GovernancePowerPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -40,20 +41,29 @@ export function GovernancePowerPage() {
       </div>
 
       {/* Privacy Visualization */}
-      <div className="bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl p-6 mb-8 border border-indigo-100">
-        <div className="flex items-start gap-4">
-          <div className="bg-white p-3 rounded-xl shadow-sm">
-            <Eye className="w-6 h-6 text-indigo-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">How It Works</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              We generate a zero-knowledge proof that verifies your governance voting power 
-              without revealing your exact token count or voting history.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PrivacyVisualization
+        featureName="Governance Power"
+        protectedData={[
+          'Exact token count',
+          'Voting history',
+          'Proposal choices',
+          'Wallet composition',
+          'Delegation patterns'
+        ]}
+        exposedData={[
+          'Proof hash only',
+          'Voting power range (not exact)',
+          'Has voting rights (yes/no)',
+          'Proof expiration date'
+        ]}
+        processSteps={[
+          'Your token data stays on your device',
+          'We check governance eligibility locally',
+          'Zero-knowledge proof is generated mathematically',
+          'Only the proof is shared - never your holdings',
+          'DAO verifies proof without seeing your token count'
+        ]}
+      />
 
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
@@ -77,6 +87,7 @@ export function GovernancePowerPage() {
       {userAddress && (
         <GovernancePowerProof 
           userAddress={userAddress}
+          proofHash={proofHash || undefined}
           onVerified={(hash, data) => {
             setProofHash(hash);
             setGovernanceData(data);

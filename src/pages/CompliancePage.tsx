@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { CheckCircle, Lock, Shield, Sparkles, ArrowLeft, Eye } from 'lucide-react';
+import { CheckCircle, Lock, Shield, Sparkles, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CompliancePassport } from '../components/zk/CompliancePassport';
+import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
 
 export function CompliancePage() {
   const [userAddress, setUserAddress] = useState('');
@@ -39,21 +40,29 @@ export function CompliancePage() {
       </div>
 
       {/* Privacy Visualization */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 mb-8 border border-blue-100">
-        <div className="flex items-start gap-4">
-          <div className="bg-white p-3 rounded-xl shadow-sm">
-            <Eye className="w-6 h-6 text-purple-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">How It Works</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              We generate a mathematical proof that verifies your KYC/accreditation status 
-              without ever sharing your personal information. Only the proof hash is revealed, 
-              not the underlying data.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PrivacyVisualization
+        featureName="Compliance Passport"
+        protectedData={[
+          'Personal identity (name, DOB)',
+          'KYC documents',
+          'Accreditation details',
+          'Financial information',
+          'Government ID numbers'
+        ]}
+        exposedData={[
+          'Proof hash only',
+          'Compliance status (yes/no)',
+          'Compliance type (KYC/Accredited)',
+          'Proof expiration date'
+        ]}
+        processSteps={[
+          'Your KYC data stays on your device',
+          'We verify compliance status locally',
+          'Zero-knowledge proof is generated mathematically',
+          'Only the proof is shared - never your identity',
+          'Marketplace verifies proof without seeing your personal data'
+        ]}
+      />
 
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
