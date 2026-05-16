@@ -3,6 +3,7 @@ import { CheckCircle, Heart, Lock, ArrowLeft, ShieldAlert, TrendingUp, Coins } f
 import { Link } from 'react-router-dom';
 import { RoyaltyComplianceProof } from '../components/zk/RoyaltyComplianceProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
+import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 
 export function RoyaltyCompliancePage() {
   const [userAddress, setUserAddress] = useState('');
@@ -65,6 +66,38 @@ export function RoyaltyCompliancePage() {
         ]}
       />
 
+      {/* Problems Solved */}
+      <ProblemsSolved
+        featureName="Royalty Compliance"
+        problems={[
+          {
+            title: "Creator Underpayment",
+            description: "NFT traders often bypass royalty payments by trading on marketplaces that don't enforce creator royalties, depriving artists of their rightful earnings.",
+            severity: 'high'
+          },
+          {
+            title: "Trading Privacy Concerns",
+            description: "Proving royalty compliance typically requires revealing entire transaction history, exposing trading patterns, counterparties, and portfolio composition.",
+            severity: 'high'
+          },
+          {
+            title: "Marketplace Fragmentation",
+            description: "Different marketplaces have different royalty enforcement policies, making it difficult for creators to track compliance across platforms.",
+            severity: 'medium'
+          },
+          {
+            title: "Wash Trading Detection",
+            description: "Without proper verification, wash traders can artificially inflate trading volumes while avoiding royalty payments, manipulating market metrics.",
+            severity: 'high'
+          },
+          {
+            title: "Cross-Platform Tracking",
+            description: "Creators cannot easily verify if a trader consistently pays royalties across all marketplaces without accessing private trading data.",
+            severity: 'medium'
+          }
+        ]}
+      />
+
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
         <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -91,6 +124,10 @@ export function RoyaltyCompliancePage() {
           onVerified={(hash, data) => {
             setProofHash(hash);
             setComplianceData(data);
+          }}
+          onRegenerate={() => {
+            setProofHash(null);
+            setComplianceData(null);
           }}
         />
       )}

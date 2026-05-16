@@ -3,6 +3,7 @@ import { CheckCircle, Gift, Lock, ArrowLeft, ShieldAlert, Clock, Wallet } from '
 import { Link } from 'react-router-dom';
 import { AirdropEligibilityProof } from '../components/zk/AirdropEligibilityProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
+import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 
 export function AirdropEligibilityPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -64,6 +65,38 @@ export function AirdropEligibilityPage() {
         ]}
       />
 
+      {/* Problems Solved */}
+      <ProblemsSolved
+        featureName="Airdrop Eligibility"
+        problems={[
+          {
+            title: "Sybil Attack Vulnerability",
+            description: "Traditional airdrops are vulnerable to sybil attacks where users create multiple wallets to claim rewards multiple times, devaluing the airdrop for genuine users.",
+            severity: 'high'
+          },
+          {
+            title: "Privacy Invasion",
+            description: "Airdrop eligibility checks often require users to reveal their wallet balance, transaction history, and holdings to prove they're legitimate users, exposing sensitive financial data.",
+            severity: 'high'
+          },
+          {
+            title: "Centralized Verification",
+            description: "Most airdrop eligibility is verified by centralized servers that collect user data, creating privacy risks and single points of failure.",
+            severity: 'medium'
+          },
+          {
+            title: "Cross-Chain Incompatibility",
+            description: "Airdrops are often limited to specific chains, forcing users to bridge funds and reveal cross-chain transaction history.",
+            severity: 'medium'
+          },
+          {
+            title: "Fair Distribution Issues",
+            description: "Without proper eligibility verification, airdrops may be claimed by bots and wash traders instead of genuine community members.",
+            severity: 'high'
+          }
+        ]}
+      />
+
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
         <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -90,6 +123,10 @@ export function AirdropEligibilityPage() {
           onVerified={(hash, data) => {
             setProofHash(hash);
             setEligibilityData(data);
+          }}
+          onRegenerate={() => {
+            setProofHash(null);
+            setEligibilityData(null);
           }}
         />
       )}

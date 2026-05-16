@@ -3,6 +3,7 @@ import { CheckCircle, Lock, Shield, Sparkles, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CompliancePassport } from '../components/zk/CompliancePassport';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
+import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 
 export function CompliancePage() {
   const [userAddress, setUserAddress] = useState('');
@@ -61,6 +62,38 @@ export function CompliancePage() {
           'Zero-knowledge proof is generated mathematically',
           'Only the proof is shared - never your identity',
           'Marketplace verifies proof without seeing your personal data'
+        ]}
+      />
+
+      {/* Problems Solved */}
+      <ProblemsSolved
+        featureName="Compliance Passport"
+        problems={[
+          {
+            title: "Identity Exposure",
+            description: "Traditional KYC requires users to repeatedly submit personal identity documents to every platform, exposing sensitive data to multiple third parties and increasing identity theft risk.",
+            severity: 'high'
+          },
+          {
+            title: "Centralized Data Silos",
+            description: "Compliance data is stored in centralized databases that are vulnerable to breaches, leaks, and unauthorized access, putting millions of users' personal information at risk.",
+            severity: 'high'
+          },
+          {
+            title: "Repeated Verification",
+            description: "Users must undergo KYC processes on every platform they use, creating friction and requiring them to share the same personal information repeatedly.",
+            severity: 'medium'
+          },
+          {
+            title: "RWA Access Barriers",
+            description: "Real World Asset (RWA) purchases require accreditation verification, but proving status without revealing financial details creates privacy concerns for high-net-worth individuals.",
+            severity: 'high'
+          },
+          {
+            title: "Cross-Platform Compliance",
+            description: "Compliance status cannot be easily transferred between platforms without exposing the underlying verification data, forcing users to repeat the process.",
+            severity: 'medium'
+          }
         ]}
       />
 

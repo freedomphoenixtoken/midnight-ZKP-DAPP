@@ -3,6 +3,7 @@ import { CheckCircle, TrendingUp, Lock, ShieldCheck, Sparkles, ArrowLeft, Shield
 import { Link } from 'react-router-dom';
 import { RentalTrustScore } from '../components/zk/RentalTrustScore';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
+import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 
 export function RentalTrustPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -62,6 +63,38 @@ export function RentalTrustPage() {
           'Zero-knowledge proof is generated mathematically',
           'Only the proof is shared - never your history',
           'Marketplace verifies proof without seeing your rental transactions'
+        ]}
+      />
+
+      {/* Problems Solved */}
+      <ProblemsSolved
+        featureName="Rental Trust Score"
+        problems={[
+          {
+            title: "Privacy in Rental History",
+            description: "Proving rental reliability typically requires sharing complete rental history, including specific properties, landlords, and payment details, exposing sensitive personal information.",
+            severity: 'high'
+          },
+          {
+            title: "Trust Verification Friction",
+            description: "NFT rental platforms struggle to verify user reliability without access to off-chain rental history, creating trust barriers and requiring manual verification.",
+            severity: 'high'
+          },
+          {
+            title: "Cross-Platform Trust",
+            description: "Rental trust scores cannot be transferred between platforms without revealing the underlying rental transactions, forcing users to rebuild reputation on each platform.",
+            severity: 'medium'
+          },
+          {
+            title: "Rental Fraud",
+            description: "Without proper trust verification, malicious actors can damage NFT rentals through late returns, damage, or non-payment, harming the rental ecosystem.",
+            severity: 'high'
+          },
+          {
+            title: "Historical Data Exposure",
+            description: "Traditional verification requires exposing historical rental data that users may want to keep private for personal or competitive reasons.",
+            severity: 'medium'
+          }
         ]}
       />
 

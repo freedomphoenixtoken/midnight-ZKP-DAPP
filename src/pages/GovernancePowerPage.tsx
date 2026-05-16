@@ -3,6 +3,7 @@ import { CheckCircle, Vote, Lock, ArrowLeft, ShieldAlert, Users, Crown } from 'l
 import { Link } from 'react-router-dom';
 import { GovernancePowerProof } from '../components/zk/GovernancePowerProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
+import { ProblemsSolved } from '../components/problems/ProblemsSolved';
 
 export function GovernancePowerPage() {
   const [userAddress, setUserAddress] = useState('');
@@ -65,6 +66,38 @@ export function GovernancePowerPage() {
         ]}
       />
 
+      {/* Problems Solved */}
+      <ProblemsSolved
+        featureName="Governance Power"
+        problems={[
+          {
+            title: "Whale Dominance",
+            description: "Large token holders (whales) can dominate governance decisions, making it difficult for smaller holders to have meaningful influence without revealing their holdings.",
+            severity: 'high'
+          },
+          {
+            title: "Vote Buying",
+            description: "Voting power can be bought or rented without proper verification, allowing malicious actors to manipulate governance outcomes.",
+            severity: 'high'
+          },
+          {
+            title: "Privacy in Voting",
+            description: "Governance voting typically requires revealing token holdings and voting history, exposing users to targeting and social engineering attacks.",
+            severity: 'high'
+          },
+          {
+            title: "Sybil Attacks",
+            description: "Attackers can create multiple wallets to amplify voting power without proper identity verification mechanisms.",
+            severity: 'high'
+          },
+          {
+            title: "Cross-DAO Verification",
+            description: "Users cannot easily prove their governance credentials across multiple DAOs without repeatedly revealing their holdings.",
+            severity: 'medium'
+          }
+        ]}
+      />
+
       {/* Wallet Input Section */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-6 border border-gray-200">
         <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -91,6 +124,10 @@ export function GovernancePowerPage() {
           onVerified={(hash, data) => {
             setProofHash(hash);
             setGovernanceData(data);
+          }}
+          onRegenerate={() => {
+            setProofHash(null);
+            setGovernanceData(null);
           }}
         />
       )}

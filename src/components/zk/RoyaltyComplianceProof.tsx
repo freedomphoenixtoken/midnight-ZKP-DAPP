@@ -1,16 +1,52 @@
-import { useState } from 'react';
-import { Heart, AlertCircle, Loader2, Sparkles, CheckCircle2, Eye, TrendingUp, Coins, Twitter, Link as LinkIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Heart, AlertCircle, Loader2, Sparkles, CheckCircle2, Eye, TrendingUp, Coins, Twitter, Link as LinkIcon, RefreshCw, Shield, Clock } from 'lucide-react';
 
 interface RoyaltyComplianceProofProps {
   userAddress: string;
   onVerified: (hash: string, data: any) => void;
   proofHash?: string;
+  onRegenerate?: () => void;
 }
 
-export function RoyaltyComplianceProof({ userAddress, onVerified, proofHash }: RoyaltyComplianceProofProps) {
+export function RoyaltyComplianceProof({ userAddress, onVerified, proofHash, onRegenerate }: RoyaltyComplianceProofProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generationStep, setGenerationStep] = useState(0);
+  const [proofGeneratedAt, setProofGeneratedAt] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
+
+  useEffect(() => {
+    if (proofHash && !proofGeneratedAt) {
+      setProofGeneratedAt(new Date());
+    }
+  }, [proofHash, proofGeneratedAt]);
+
+  useEffect(() => {
+    if (!proofGeneratedAt) return;
+
+    const calculateTimeRemaining = () => {
+      const now = new Date();
+      const expiration = new Date(proofGeneratedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const diff = expiration.getTime() - now.getTime();
+
+      if (diff <= 0) return 'Expired';
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      if (days > 0) return `${days}d ${hours}h remaining`;
+      if (hours > 0) return `${hours}h ${minutes}m remaining`;
+      return `${minutes}m remaining`;
+    };
+
+    setTimeRemaining(calculateTimeRemaining());
+    const interval = setInterval(() => {
+      setTimeRemaining(calculateTimeRemaining());
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [proofGeneratedAt]);
 
   const shareOnTwitter = () => {
     if (!proofHash) return;
@@ -22,6 +58,16 @@ export function RoyaltyComplianceProof({ userAddress, onVerified, proofHash }: R
   const copyProofHash = () => {
     if (!proofHash) return;
     navigator.clipboard.writeText(proofHash);
+  };
+
+  const regenerateProof = () => {
+    setProofGeneratedAt(null);
+    setTimeRemaining('');
+    if (onRegenerate) {
+      onRegenerate();
+    } else {
+      generateProof();
+    }
   };
 
   const generateProof = async () => {
@@ -192,11 +238,23 @@ export function RoyaltyComplianceProof({ userAddress, onVerified, proofHash }: R
               <p className="text-sm text-green-700">Your royalty compliance is verified</p>
             </div>
           </div>
+          
+          {timeRemaining && (
+            <div className="bg-white rounded-lg p-3 mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <div>
+                <div className="text-xs text-gray-500">Proof Expires In</div>
+                <div className="font-semibold text-gray-900">{timeRemaining}</div>
+              </div>
+              <Shield className="w-5 h-5 text-green-600 ml-auto" />
+            </div>
+          )}
+
           <div className="bg-white rounded-lg p-3 mb-4">
             <div className="text-xs text-gray-500 mb-1">Proof Hash</div>
             <div className="font-mono text-sm text-gray-900 break-all">{proofHash}</div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 mb-3">
             <button
               onClick={shareOnTwitter}
               className="flex-1 flex items-center justify-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
@@ -212,6 +270,13 @@ export function RoyaltyComplianceProof({ userAddress, onVerified, proofHash }: R
               Copy Hash
             </button>
           </div>
+          <button
+            onClick={regenerateProof}
+            className="w-full flex items-center justify-center gap-2 bg-purple-100 text-purple-900 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors border border-purple-300"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Regenerate Proof
+          </button>
         </div>
       )}
     </div>
