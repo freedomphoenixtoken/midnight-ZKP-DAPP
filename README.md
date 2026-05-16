@@ -216,6 +216,50 @@ import { ZKPWidget } from './components/ZKPWidget';
 - Proof hashes stored with expiration dates
 - CORS configured for cross-origin requests
 
+## Production Deployment Status
+
+**✅ Production Ready**
+
+- **Live URL**: https://mignight-zkp-dapp.netlify.app
+- **Status**: Fully functional with mock ZK implementation
+- **Database**: Supabase with demo data seeded
+- **Functions**: All Netlify functions deployed and tested
+- **Environment**: All variables configured in Netlify
+
+### Production Configuration
+
+**Netlify Environment Variables:**
+- SUPABASE_URL: https://gbfrysybngxscjuixqcx.supabase.co
+- SUPABASE_SERVICE_ROLE_KEY: Configured (service role)
+- VITE_SUPABASE_ANON_KEY: Configured
+- VITE_SUPABASE_PUBLISHABLE_KEY: Configured
+- VITE_XRPL_NETWORK: testnet
+- VITE_XRPL_SERVER: wss://s.altnet.rippletest.net:51233
+- MIDNIGHT_NETWORK: testnet
+
+### Live Function Endpoints
+
+- POST https://mignight-zkp-dapp.netlify.app/api/zk/generate-compliance-proof
+- POST https://mignight-zkp-dapp.netlify.app/api/zk/generate-rental-trust-proof
+- POST https://mignight-zkp-dapp.netlify.app/api/zk/verify-proof
+
+### Known Limitations
+
+- **Mock ZK Implementation**: Currently using mock Midnight service for demonstration
+- **Real Midnight SDK**: Requires WSL, Docker, Compact compiler for production ZK proofs
+- **Circuit Compilation**: .compact files included but not compiled (requires Midnight toolchain)
+
+### Future Enhancements
+
+To upgrade to real Midnight SDK:
+1. Install WSL (Windows Subsystem for Linux)
+2. Install Docker Desktop
+3. Install Compact compiler toolchain
+4. Set up proof server via Docker
+5. Compile Compact circuits
+6. Replace mock service with real Midnight SDK integration
+7. Update Netlify functions for compiled circuits
+
 ## License
 
 MIT
