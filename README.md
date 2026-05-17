@@ -92,11 +92,21 @@ A production-ready Zero-Knowledge Proof (ZKP) decentralized application for priv
 
 ## 📋 Prerequisites
 
+### Midnight Development Setup (Required for Compact Contracts)
+- **Compact compiler installed** - Midnight's smart contract language compiler
+- **Docker Desktop** - Required for Midnight proof server
+- **1AM Wallet** - Midnight wallet for ZK proof generation
+- **Node.js 22+** - Required for Midnight toolchain
+- **WSL (Windows)** - Windows Subsystem for Linux for Compact compiler
+
+### Standard Setup
 - Node.js 18+
 - Supabase account
 - XRPL testnet account (for real data fetching)
 
 ## 🔧 Installation
+
+### Standard Installation
 
 1. Clone the repository
 ```bash
@@ -122,6 +132,73 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 VITE_XRPL_NETWORK=testnet
 VITE_XRPL_SERVER=wss://s.altnet.rippletest.net:51233
 ```
+
+### Midnight Compact Compiler Installation (Windows)
+
+#### Step 1: Install Ubuntu in WSL
+Open PowerShell as Administrator and run:
+```powershell
+wsl --install -d Ubuntu
+```
+Restart your computer when prompted.
+
+#### Step 2: Install Compact Compiler
+After restart, open Ubuntu terminal and run:
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install curl
+sudo apt install -y curl
+
+# Install Compact compiler
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+
+# Reload shell configuration
+source ~/.bashrc
+
+# Verify installation
+compact --version
+
+# Update to latest version
+compact update
+```
+
+#### Step 3: Install Docker Desktop
+1. Download Docker Desktop for Windows: https://www.docker.com/products/docker-desktop/
+2. Install with WSL 2 integration enabled
+3. Start Docker Desktop
+4. Verify: `docker --version`
+
+#### Step 4: Compile Compact Contracts
+```bash
+# In Ubuntu terminal (project directory)
+npm run compile:contracts
+```
+
+This will compile all Compact contracts to the `compiled-contracts/` directory.
+
+### 1AM Wallet Configuration
+
+#### Step 1: Install 1AM Wallet
+1. Visit: https://1am.xyz/
+2. Install browser extension
+3. Create wallet
+
+#### Step 2: Configure for Pre-Prod Network
+1. Open 1AM wallet settings
+2. Go to Network settings
+3. Select "Pre-Prod" network
+
+#### Step 3: Enable Proof Station
+1. In 1AM wallet settings, enable "Proof Station"
+2. This bypasses proof server and Docker requirements
+3. Allows in-browser ZK proof generation
+
+#### Step 4: Get Test Tokens
+1. Visit pre-prod faucet: https://faucet.midnight.network/
+2. Generate NIGHT tokens
+3. DUST tokens will auto-generate
 
 ## 🗄 Database Setup
 
