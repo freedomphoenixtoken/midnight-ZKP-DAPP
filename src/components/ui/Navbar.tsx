@@ -9,6 +9,7 @@ export function Navbar() {
   const [isZKDropdownOpen, setIsZKDropdownOpen] = useState(false);
   const [isBusinessDropdownOpen, setIsBusinessDropdownOpen] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   const isActive = (path: string) => location.pathname === path;
@@ -31,7 +32,14 @@ export function Navbar() {
   ];
 
   const connectWallet = async () => {
+    // Prevent multiple simultaneous connection attempts
+    if (isConnecting) {
+      console.log('Connection already in progress, please wait...');
+      return;
+    }
+
     try {
+      setIsConnecting(true);
       console.log('Attempting to connect to wallet...');
       
       // Check if window.midnight exists
@@ -75,6 +83,8 @@ export function Navbar() {
     } catch (error) {
       console.error('Wallet connection failed:', error);
       alert(`Failed to connect wallet: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure:\n1. 1AM wallet extension is installed\n2. Wallet is unlocked\n3. You are using a supported browser (Brave, Chrome)\n4. Check browser console for more details`);
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -193,14 +203,17 @@ export function Navbar() {
             {/* Connect Wallet Button */}
             <button
               onClick={connectWallet}
+              disabled={isConnecting || isWalletConnected}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isWalletConnected
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm'
+                  : isConnecting
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg'
               }`}
             >
               <Wallet className="w-4 h-4" />
-              {isWalletConnected ? 'Connected' : 'Connect Wallet'}
+              {isConnecting ? 'Connecting...' : isWalletConnected ? 'Connected' : 'Connect Wallet'}
             </button>
 
             {/* Theme Toggle */}
@@ -218,14 +231,17 @@ export function Navbar() {
             {/* Connect Wallet Button (Mobile) */}
             <button
               onClick={connectWallet}
+              disabled={isConnecting || isWalletConnected}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isWalletConnected
                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+                  : isConnecting
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
               }`}
             >
               <Wallet className="w-4 h-4" />
-              {isWalletConnected ? '✓' : <Wallet className="w-4 h-4" />}
+              {isConnecting ? '...' : isWalletConnected ? '✓' : <Wallet className="w-4 h-4" />}
             </button>
 
             <button
