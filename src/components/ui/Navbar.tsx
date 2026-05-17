@@ -32,22 +32,58 @@ export function Navbar() {
 
   const connectWallet = async () => {
     try {
-      // Check if 1AM wallet is available
-      if (typeof window !== 'undefined' && (window as any).midnight) {
-        const wallet = (window as any).midnight['1am'];
-        if (wallet) {
-          await wallet.connect('pre-prod');
+      console.log('Attempting to connect to wallet...');
+      
+      // Check if window.midnight exists
+      if (typeof window === 'undefined') {
+        console.error('Window is not available');
+        alert('Window is not available. This should only happen in server-side rendering.');
+        return;
+      }
+
+      console.log('Window object available, checking for midnight...');
+      
+      // Check if midnight exists on window
+      if (!(window as any).midnight) {
+        console.error('window.midnight not found');
+        alert('Midnight wallet not found. Please install the 1AM wallet extension from https://1am.xyz/');
+        return;
+      }
+
+      console.log('window.midnight found, checking for 1am wallet...');
+      
+      // Check if 1AM wallet exists
+      const wallet = (window as any).midnight['1am'];
+      if (!wallet) {
+        console.error('1AM wallet not found in window.midnight');
+        alert('1AM wallet not found. Please install the 1AM wallet extension from https://1am.xyz/');
+        return;
+      }
+
+      console.log('1AM wallet found, attempting connection...');
+      
+      // Try to connect to pre-prod network
+      try {
+        await wallet.connect('pre-prod');
+        setIsWalletConnected(true);
+        console.log('Wallet connected successfully to pre-prod');
+        alert('Wallet connected successfully!');
+      } catch (connectError) {
+        console.error('Connection to pre-prod failed, trying mainnet...', connectError);
+        // Fallback to mainnet if pre-prod fails
+        try {
+          await wallet.connect('mainnet');
           setIsWalletConnected(true);
-          console.log('Wallet connected successfully');
-        } else {
-          alert('1AM wallet not found. Please install the 1AM wallet extension.');
+          console.log('Wallet connected successfully to mainnet');
+          alert('Wallet connected successfully to mainnet!');
+        } catch (mainnetError) {
+          console.error('Connection to mainnet also failed:', mainnetError);
+          throw mainnetError;
         }
-      } else {
-        alert('Midnight wallet not available. Please install the 1AM wallet extension.');
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);
-      alert('Failed to connect wallet. Please try again.');
+      alert(`Failed to connect wallet: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure:\n1. 1AM wallet extension is installed\n2. Wallet is unlocked\n3. You are using a supported browser (Brave, Chrome)\n4. Check browser console for more details`);
     }
   };
 
