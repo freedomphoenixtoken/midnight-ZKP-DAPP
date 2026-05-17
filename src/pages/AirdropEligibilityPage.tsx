@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Gift, Lock, ArrowLeft, ShieldAlert, Clock, Wallet, Play, Eye, Shield, Info } from 'lucide-react';
+import { CheckCircle, Activity, Lock, ArrowLeft, ShieldAlert, Clock, Wallet, Play, Eye, Shield, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AirdropEligibilityProof } from '../components/zk/AirdropEligibilityProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -28,14 +28,14 @@ export function AirdropEligibilityPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="bg-gradient-to-r from-orange-100 to-yellow-100 p-4 rounded-2xl">
-            <Gift className="w-10 h-10 text-orange-600" />
+            <Activity className="w-10 h-10 text-orange-600" />
           </div>
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-yellow-600 bg-clip-text text-transparent">
-              ZK-Airdrop Eligibility
+              ZK-Transaction History Proof
             </h1>
             <p className="text-gray-600 mt-1">
-              Prove you're a legitimate user without revealing your wallet activity
+              Prove wallet activity on XRPL without revealing your transaction history
             </p>
           </div>
         </div>
@@ -43,7 +43,7 @@ export function AirdropEligibilityPage() {
         {/* Privacy Badge */}
         <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 px-4 py-2 rounded-full mb-6">
           <Lock className="w-4 h-4 text-green-600" />
-          <span className="text-sm font-medium text-green-800">Privacy-First: Fair airdrops without privacy invasion</span>
+          <span className="text-sm font-medium text-green-800">Privacy-First: Your transaction history stays private</span>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export function AirdropEligibilityPage() {
           defaultOpen={false}
         >
           <DemoMode
-            featureName="Airdrop Eligibility"
+            featureName="Transaction History Proof"
             onStartDemo={() => setIsDemoRunning(true)}
             isDemoRunning={isDemoRunning}
           />
@@ -94,7 +94,7 @@ export function AirdropEligibilityPage() {
           icon={<Eye className="w-5 h-5 text-purple-600" />}
           defaultOpen={false}
         >
-          <DataFlowVisualization featureName="Airdrop Eligibility" />
+          <DataFlowVisualization featureName="Transaction History Proof" />
         </Accordion>
 
         <Accordion 
@@ -103,20 +103,20 @@ export function AirdropEligibilityPage() {
           defaultOpen={false}
         >
           <BeforeAfterComparison
-            featureName="Airdrop Eligibility"
+            featureName="Transaction History Proof"
             beforeData={[
-              'Full wallet balance exposed',
-              'Complete transaction history shared',
-              'NFT holdings visible to all',
-              'IP address tracked',
-              'Personal identity linked to wallet'
+              'Complete transaction history exposed',
+              'Transaction amounts visible to all',
+              'Counterparty addresses revealed',
+              'Transaction types tracked',
+              'Timing patterns analyzed'
             ]}
             afterData={[
-              'Only eligibility status revealed',
-              'Proof hash shared (no data)',
-              'NFT holdings remain private',
-              'IP address never collected',
-              'Identity never linked to proof'
+              'Only activity status revealed',
+              'Transaction amounts private',
+              'Counterparties remain anonymous',
+              'Transaction types hidden',
+              'Timing patterns protected'
             ]}
           />
         </Accordion>
@@ -127,25 +127,26 @@ export function AirdropEligibilityPage() {
           defaultOpen={false}
         >
           <PrivacyVisualization
-            featureName="Airdrop Eligibility"
+            featureName="Transaction History Proof"
             protectedData={[
-              'Wallet balance',
-              'Transaction history',
-              'NFT holdings',
-              'Personal identity',
-              'IP address'
+              'Transaction amounts',
+              'Counterparty addresses',
+              'Transaction types',
+              'Timing patterns',
+              'Specific transaction details'
             ]}
             exposedData={[
               'Proof hash only',
-              'Eligibility status (yes/no)',
+              'Activity status (yes/no)',
+              'Transaction count range',
               'Proof expiration date'
             ]}
             processSteps={[
-              'Your wallet data stays on your device',
-              'We check eligibility criteria locally (30+ days, 5+ txns, holds XRP)',
+              'Your transaction data stays on your device',
+              'We check activity from XRPL ledger',
               'Zero-knowledge proof is generated mathematically',
-              'Only the proof is shared - never your data',
-              'Marketplace verifies proof without seeing your wallet'
+              'Only the proof is shared - never your transactions',
+              'Marketplace verifies proof without seeing your history'
             ]}
           />
         </Accordion>
@@ -156,38 +157,37 @@ export function AirdropEligibilityPage() {
           defaultOpen={false}
         >
           <ProblemsSolved
-            featureName="Airdrop Eligibility"
+            featureName="Transaction History Proof"
             problems={[
               {
-                title: "Sybil Attack Vulnerability",
-                description: "Traditional airdrops are vulnerable to sybil attacks where users create multiple wallets to claim rewards multiple times, devaluing the airdrop for genuine users.",
+                title: "Transaction Privacy",
+                description: "Traditional transaction verification requires revealing complete transaction history, exposing financial patterns, counterparties, and trading strategies to surveillance and analysis.",
                 severity: 'high'
               },
               {
-                title: "Privacy Invasion",
-                description: "Airdrop eligibility checks often require users to reveal their wallet balance, transaction history, and holdings to prove they're legitimate users, exposing sensitive financial data.",
+                title: "Sybil Attack Prevention",
+                description: "XRPL marketplaces need to verify legitimate wallet activity without revealing transaction history to prevent sybil attacks while maintaining user privacy.",
                 severity: 'high'
               },
               {
-                title: "Centralized Verification",
-                description: "Most airdrop eligibility is verified by centralized servers that collect user data, creating privacy risks and single points of failure.",
+                title: "Pattern Analysis",
+                description: "Transaction history reveals spending patterns, trading strategies, and behavioral data that can be used for profiling and targeted manipulation on XRPL.",
+                severity: 'high'
+              },
+              {
+                title: "Counterparty Privacy",
+                description: "Traditional verification exposes counterparty addresses, revealing business relationships, trading partners, and network connections on XRPL.",
+                severity: 'high'
+              },
+              {
+                title: "Marketplace Eligibility",
+                description: "XRPL NFT marketplaces often require transaction history verification for eligibility, forcing users to compromise privacy to access premium features.",
                 severity: 'medium'
-              },
-              {
-                title: "Cross-Chain Incompatibility",
-                description: "Airdrops are often limited to specific chains, forcing users to bridge funds and reveal cross-chain transaction history.",
-                severity: 'medium'
-              },
-              {
-                title: "Fair Distribution Issues",
-                description: "Without proper eligibility verification, airdrops may be claimed by bots and wash traders instead of genuine community members.",
-                severity: 'high'
               }
             ]}
           />
         </Accordion>
       </div>
-
 
       {/* Success State with Magic Moment */}
       {proofHash && eligibilityData && (
@@ -197,8 +197,8 @@ export function AirdropEligibilityPage() {
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-green-800">Eligibility Verified</h3>
-              <p className="text-green-600 text-sm">You qualify for airdrops</p>
+              <h3 className="text-2xl font-bold text-green-800">Transaction History Verified</h3>
+              <p className="text-green-600 text-sm">Your wallet activity has been proven</p>
             </div>
           </div>
 
@@ -211,14 +211,14 @@ export function AirdropEligibilityPage() {
                 <div className="text-xs text-gray-500">Days Active</div>
               </div>
               <div className="bg-green-50 rounded-lg p-4 text-center">
-                <Wallet className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                <Activity className="w-6 h-6 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">5+</div>
                 <div className="text-xs text-gray-500">Transactions</div>
               </div>
               <div className="bg-green-50 rounded-lg p-4 text-center">
-                <Gift className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                <Wallet className="w-6 h-6 text-green-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">✓</div>
-                <div className="text-xs text-gray-500">Holds XRP</div>
+                <div className="text-xs text-gray-500">Active Wallet</div>
               </div>
             </div>
           </div>
@@ -237,13 +237,12 @@ export function AirdropEligibilityPage() {
 
               <div className="flex items-center gap-2 text-sm text-green-700">
                 <ShieldAlert className="w-4 h-4" />
-                <span className="font-medium">Your wallet details remain completely private</span>
+                <span className="font-medium">Your transaction details remain completely private</span>
               </div>
 
               <div className="bg-orange-50 rounded-lg p-4">
                 <p className="text-sm text-orange-800">
-                  <span className="font-semibold">Next Step:</span> Use this proof hash to claim airdrops from participating marketplaces. 
-                  They will verify your eligibility without seeing your wallet activity.
+                  <span className="font-semibold">Next Step:</span> Use this proof hash in XRPL marketplaces for NFT trading, RWA purchases, or premium features. The marketplace will verify your activity without seeing your transaction history.
                 </p>
               </div>
             </div>

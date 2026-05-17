@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Lock, Shield, ArrowLeft, Play, Eye, Info } from 'lucide-react';
+import { CheckCircle, Lock, Shield, ArrowLeft, Play, Eye, Info, Image } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CompliancePassport } from '../components/zk/CompliancePassport';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -27,14 +27,14 @@ export function CompliancePage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="bg-gradient-to-r from-blue-100 to-purple-100 p-4 rounded-2xl">
-            <Shield className="w-10 h-10 text-blue-600" />
+            <Image className="w-10 h-10 text-blue-600" />
           </div>
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              ZK-Compliance Passport
+              ZK-NFT Ownership Proof
             </h1>
             <p className="text-gray-600 mt-1">
-              Prove your compliance without revealing your identity
+              Prove NFT ownership on XRPL without revealing your entire portfolio
             </p>
           </div>
         </div>
@@ -42,7 +42,7 @@ export function CompliancePage() {
         {/* Privacy Badge */}
         <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 px-4 py-2 rounded-full mb-6">
           <Lock className="w-4 h-4 text-green-600" />
-          <span className="text-sm font-medium text-green-800">Privacy-First: Your data stays private</span>
+          <span className="text-sm font-medium text-green-800">Privacy-First: Your NFT portfolio stays private</span>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export function CompliancePage() {
           defaultOpen={false}
         >
           <DemoMode
-            featureName="Compliance Passport"
+            featureName="NFT Ownership Proof"
             onStartDemo={() => setIsDemoRunning(true)}
             isDemoRunning={isDemoRunning}
           />
@@ -90,7 +90,7 @@ export function CompliancePage() {
           icon={<Eye className="w-5 h-5 text-purple-600" />}
           defaultOpen={false}
         >
-          <DataFlowVisualization featureName="Compliance Passport" />
+          <DataFlowVisualization featureName="NFT Ownership Proof" />
         </Accordion>
 
         <Accordion 
@@ -99,20 +99,20 @@ export function CompliancePage() {
           defaultOpen={false}
         >
           <BeforeAfterComparison
-            featureName="Compliance Passport"
+            featureName="NFT Ownership Proof"
             beforeData={[
-              'Full identity documents shared',
-              'KYC details exposed to all',
-              'Accreditation details revealed',
-              'Financial information visible',
-              'Government ID numbers stored'
+              'Full NFT portfolio exposed',
+              'All NFT IDs visible to all',
+              'NFT metadata shared publicly',
+              'Purchase history revealed',
+              'Portfolio composition tracked'
             ]}
             afterData={[
-              'Only compliance status revealed',
-              'KYC details remain private',
-              'Accreditation status only',
-              'Financial information protected',
-              'ID numbers never stored'
+              'Only ownership status revealed',
+              'NFT count range (not exact)',
+              'Specific NFTs remain private',
+              'Purchase history protected',
+              'Portfolio composition hidden'
             ]}
           />
         </Accordion>
@@ -123,26 +123,26 @@ export function CompliancePage() {
           defaultOpen={false}
         >
           <PrivacyVisualization
-            featureName="Compliance Passport"
+            featureName="NFT Ownership Proof"
             protectedData={[
-              'Personal identity (name, DOB)',
-              'KYC documents',
-              'Accreditation details',
-              'Financial information',
-              'Government ID numbers'
+              'Specific NFT IDs',
+              'Complete NFT portfolio',
+              'NFT purchase history',
+              'NFT metadata',
+              'Portfolio composition'
             ]}
             exposedData={[
               'Proof hash only',
-              'Compliance status (yes/no)',
-              'Compliance type (KYC/Accredited)',
+              'NFT ownership status (yes/no)',
+              'NFT count range (not exact)',
               'Proof expiration date'
             ]}
             processSteps={[
-              'Your KYC data stays on your device',
-              'We verify compliance status locally',
+              'Your NFT data stays on your device',
+              'We verify NFT ownership from XRPL ledger',
               'Zero-knowledge proof is generated mathematically',
-              'Only the proof is shared - never your identity',
-              'Marketplace verifies proof without seeing your personal data'
+              'Only the proof is shared - never your NFTs',
+              'Marketplace verifies proof without seeing your portfolio'
             ]}
           />
         </Accordion>
@@ -153,32 +153,32 @@ export function CompliancePage() {
           defaultOpen={false}
         >
           <ProblemsSolved
-            featureName="Compliance Passport"
+            featureName="NFT Ownership Proof"
             problems={[
               {
-                title: "Identity Exposure",
-                description: "Traditional compliance verification requires sharing complete identity documents, KYC data, and government IDs with every platform, creating massive privacy risks and data breaches.",
+                title: "Portfolio Privacy",
+                description: "Traditional NFT ownership verification requires revealing complete NFT portfolios, exposing valuable holdings and trading patterns to competitors and malicious actors.",
                 severity: 'high'
               },
               {
-                title: "Centralized Data Silos",
-                description: "Compliance data is stored in centralized databases that become honeypots for hackers, with single points of failure and no user control over personal information.",
+                title: "Whale Targeting",
+                description: "Public NFT holdings make whale accounts visible targets for manipulation, front-running, and predatory trading strategies on XRPL marketplaces.",
                 severity: 'high'
               },
               {
-                title: "Repeated Verification",
-                description: "Users must repeatedly submit KYC documents and personal information to every platform, creating friction and exposing the same data multiple times.",
+                title: "Cross-Platform Tracking",
+                description: "NFT holdings are tracked across multiple platforms, creating privacy risks and enabling surveillance of user activity and preferences.",
+                severity: 'high'
+              },
+              {
+                title: "NFT Marketplace Privacy",
+                description: "XRPL NFT marketplaces often require public verification of NFT ownership for eligibility, forcing users to compromise privacy for access.",
                 severity: 'medium'
               },
               {
-                title: "RWA Access Barriers",
-                description: "Real World Asset (RWA) marketplaces require extensive compliance verification, but traditional methods expose sensitive financial and identity data to third parties.",
+                title: "RWA NFT Privacy",
+                description: "Real World Asset (RWA) NFTs represent sensitive ownership stakes (real estate, art, etc.) that users prefer to keep private while still proving ownership.",
                 severity: 'high'
-              },
-              {
-                title: "Cross-Platform Compliance",
-                description: "Verifying compliance across multiple platforms requires sharing personal data between services, creating privacy risks and regulatory complexity.",
-                severity: 'medium'
               }
             ]}
           />
@@ -193,7 +193,7 @@ export function CompliancePage() {
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-green-800">Compliance Verified</h3>
+              <h3 className="text-2xl font-bold text-green-800">NFT Ownership Verified</h3>
               <p className="text-green-600 text-sm">Your proof has been generated successfully</p>
             </div>
           </div>
@@ -216,8 +216,7 @@ export function CompliancePage() {
 
               <div className="bg-blue-50 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  <span className="font-semibold">Next Step:</span> Use this proof hash in your marketplace 
-                  for RWA purchases. The marketplace will verify the proof without seeing your personal data.
+                  <span className="font-semibold">Next Step:</span> Use this proof hash in XRPL NFT marketplaces for RWA purchases or exclusive NFT drops. The marketplace will verify your NFT ownership without seeing your portfolio.
                 </p>
               </div>
             </div>

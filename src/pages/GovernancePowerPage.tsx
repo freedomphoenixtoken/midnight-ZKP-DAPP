@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Vote, Lock, ArrowLeft, ShieldAlert, Users, Crown, Play, Eye, Shield, Info } from 'lucide-react';
+import { CheckCircle, Link as LinkIcon, Lock, ArrowLeft, ShieldAlert, Users, Crown, Play, Eye, Shield, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GovernancePowerProof } from '../components/zk/GovernancePowerProof';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -28,14 +28,14 @@ export function GovernancePowerPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="bg-gradient-to-r from-indigo-100 to-violet-100 p-4 rounded-2xl">
-            <Vote className="w-10 h-10 text-indigo-600" />
+            <LinkIcon className="w-10 h-10 text-indigo-600" />
           </div>
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-              ZK-Governance Power
+              ZK-Trust Line Proof
             </h1>
             <p className="text-gray-600 mt-1">
-              Vote anonymously with verified power
+              Prove trust line status on XRPL without revealing your token holdings
             </p>
           </div>
         </div>
@@ -43,7 +43,7 @@ export function GovernancePowerPage() {
         {/* Privacy Badge */}
         <div className="inline-flex items-center gap-2 bg-green-50 border border-green-200 px-4 py-2 rounded-full mb-6">
           <Lock className="w-4 h-4 text-green-600" />
-          <span className="text-sm font-medium text-green-800">Privacy-First: Vote anonymously with verified power</span>
+          <span className="text-sm font-medium text-green-800">Privacy-First: Your trust line amounts stay private</span>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export function GovernancePowerPage() {
           defaultOpen={false}
         >
           <DemoMode
-            featureName="Governance Power"
+            featureName="Trust Line Proof"
             onStartDemo={() => setIsDemoRunning(true)}
             isDemoRunning={isDemoRunning}
           />
@@ -94,7 +94,7 @@ export function GovernancePowerPage() {
           icon={<Eye className="w-5 h-5 text-purple-600" />}
           defaultOpen={false}
         >
-          <DataFlowVisualization featureName="Governance Power" />
+          <DataFlowVisualization featureName="Trust Line Proof" />
         </Accordion>
 
         <Accordion 
@@ -103,20 +103,20 @@ export function GovernancePowerPage() {
           defaultOpen={false}
         >
           <BeforeAfterComparison
-            featureName="Governance Power"
+            featureName="Trust Line Proof"
             beforeData={[
-              'Exact token count exposed',
-              'Complete voting history visible',
-              'Proposal choices tracked',
-              'Wallet composition revealed',
-              'Delegation patterns analyzed'
+              'Exact trust line amounts exposed',
+              'All token balances visible to all',
+              'Counterparty addresses revealed',
+              'Trust line limits tracked',
+              'Token holdings shared'
             ]}
             afterData={[
-              'Only voting power range revealed',
-              'Voting history remains private',
-              'Proposal choices stay hidden',
-              'Wallet composition protected',
-              'Delegation patterns never shared'
+              'Only trust line status revealed',
+              'Token amounts remain private',
+              'Counterparties stay anonymous',
+              'Trust line limits protected',
+              'Token holdings hidden'
             ]}
           />
         </Accordion>
@@ -127,26 +127,26 @@ export function GovernancePowerPage() {
           defaultOpen={false}
         >
           <PrivacyVisualization
-            featureName="Governance Power"
+            featureName="Trust Line Proof"
             protectedData={[
-              'Exact token count',
-              'Voting history',
-              'Proposal choices',
-              'Wallet composition',
-              'Delegation patterns'
+              'Exact trust line amounts',
+              'Token balances',
+              'Counterparty addresses',
+              'Trust line limits',
+              'Token holdings'
             ]}
             exposedData={[
               'Proof hash only',
-              'Voting power range (not exact)',
-              'Has voting rights (yes/no)',
+              'Trust line status (yes/no)',
+              'Trust line count (not exact)',
               'Proof expiration date'
             ]}
             processSteps={[
-              'Your token data stays on your device',
-              'We check governance eligibility locally',
+              'Your trust line data stays on your device',
+              'We check trust line status from XRPL ledger',
               'Zero-knowledge proof is generated mathematically',
-              'Only the proof is shared - never your holdings',
-              'DAO verifies proof without seeing your token count'
+              'Only the proof is shared - never your trust lines',
+              'Marketplace verifies proof without seeing your token holdings'
             ]}
           />
         </Accordion>
@@ -157,32 +157,32 @@ export function GovernancePowerPage() {
           defaultOpen={false}
         >
           <ProblemsSolved
-            featureName="Governance Power"
+            featureName="Trust Line Proof"
             problems={[
               {
-                title: "Whale Dominance",
-                description: "Large token holders (whales) often dominate DAO governance, making it difficult for smaller token holders to have meaningful influence on decisions.",
+                title: "Trust Line Privacy",
+                description: "Traditional trust line verification requires revealing exact token amounts and counterparty addresses, exposing trading relationships and portfolio composition on XRPL.",
                 severity: 'high'
               },
               {
-                title: "Vote Buying",
-                description: "Voting power can be bought or rented, allowing malicious actors to influence governance outcomes without genuine community interest.",
+                title: "Counterparty Privacy",
+                description: "Trust lines reveal counterparty addresses, exposing business relationships, trading partners, and network connections that users prefer to keep private on XRPL.",
                 severity: 'high'
               },
               {
-                title: "Privacy in Voting",
-                description: "Traditional governance systems often require revealing token holdings and voting history, exposing sensitive financial information and potentially enabling vote coercion.",
+                title: "Token Holdings Exposure",
+                description: "Trust line verification often reveals complete token holdings, making users targets for manipulation, front-running, and predatory trading strategies.",
                 severity: 'high'
               },
               {
-                title: "Sybil Attacks",
-                description: "Governance systems are vulnerable to sybil attacks where users create multiple wallets to amplify their voting power beyond their actual stake.",
-                severity: 'high'
-              },
-              {
-                title: "Cross-DAO Verification",
-                description: "Verifying governance power across multiple DAOs requires sharing voting history and token holdings between platforms, creating privacy risks.",
+                title: "Marketplace Eligibility",
+                description: "XRPL token marketplaces often require trust line verification for eligibility, forcing users to compromise privacy to access token trading features.",
                 severity: 'medium'
+              },
+              {
+                title: "Cross-Platform Tracking",
+                description: "Trust lines are tracked across multiple platforms, creating privacy risks and enabling surveillance of user activity and token preferences.",
+                severity: 'high'
               }
             ]}
           />
@@ -197,8 +197,8 @@ export function GovernancePowerPage() {
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-green-800">Governance Power Verified</h3>
-              <p className="text-green-600 text-sm">You can vote anonymously</p>
+              <h3 className="text-2xl font-bold text-green-800">Trust Line Status Verified</h3>
+              <p className="text-green-600 text-sm">Your trust line status has been proven</p>
             </div>
           </div>
 
@@ -208,17 +208,17 @@ export function GovernancePowerPage() {
               <div className="bg-indigo-50 rounded-lg p-4 text-center">
                 <Crown className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">{governanceData.votingPower || 0}</div>
-                <div className="text-xs text-gray-500">Voting Power</div>
+                <div className="text-xs text-gray-500">Trust Lines</div>
               </div>
               <div className="bg-indigo-50 rounded-lg p-4 text-center">
                 <Users className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">{governanceData.proposals || 0}</div>
-                <div className="text-xs text-gray-500">Proposals Voted</div>
+                <div className="text-xs text-gray-500">Tokens</div>
               </div>
               <div className="bg-indigo-50 rounded-lg p-4 text-center">
-                <Vote className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
+                <LinkIcon className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">{governanceData.participation || 0}%</div>
-                <div className="text-xs text-gray-500">Participation Rate</div>
+                <div className="text-xs text-gray-500">Status</div>
               </div>
             </div>
           </div>
@@ -237,13 +237,12 @@ export function GovernancePowerPage() {
 
               <div className="flex items-center gap-2 text-sm text-green-700">
                 <ShieldAlert className="w-4 h-4" />
-                <span className="font-medium">Your token holdings remain completely private</span>
+                <span className="font-medium">Your trust line amounts remain completely private</span>
               </div>
 
               <div className="bg-indigo-50 rounded-lg p-4">
                 <p className="text-sm text-indigo-800">
-                  <span className="font-semibold">Next Step:</span> Use this proof hash to participate in DAO governance anonymously. 
-                  The DAO will verify your voting power without seeing your token count.
+                  <span className="font-semibold">Next Step:</span> Use this proof hash in XRPL token marketplaces for trading, RWA purchases, or premium features. The marketplace will verify your trust line status without seeing your token holdings.
                 </p>
               </div>
             </div>
