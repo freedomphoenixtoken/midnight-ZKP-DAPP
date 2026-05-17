@@ -238,15 +238,15 @@ ls compiled-contracts/
 ## Step 7: Get Test Tokens from Pre-Prod Faucet
 
 ### Visit Pre-Prod Faucet
-1. Open browser and visit: https://faucet.midnight.network/
+1. Open browser and visit: https://midnight.network/test-faucet
 2. Ensure 1AM wallet is connected to Pre-Prod network
 3. Click "Connect Wallet" button
 4. Select 1AM wallet when prompted
 5. Approve connection in 1AM wallet popup
 
-### Request NIGHT Tokens
+### Request tDUST Tokens
 1. After connecting, you should see your address
-2. Click "Request NIGHT" or "Get Tokens" button
+2. Click "Request tDUST" or "Get Tokens" button
 3. Wait for transaction to complete (may take 10-30 seconds)
 4. You should see a success message
 
