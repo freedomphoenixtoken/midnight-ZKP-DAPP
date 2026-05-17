@@ -62,24 +62,15 @@ export function Navbar() {
 
       console.log('1AM wallet found, attempting connection...');
       
-      // Try to connect to pre-prod network
+      // Try to connect to preprod network (correct network ID)
       try {
-        await wallet.connect('pre-prod');
+        await wallet.connect('preprod');
         setIsWalletConnected(true);
-        console.log('Wallet connected successfully to pre-prod');
+        console.log('Wallet connected successfully to preprod');
         alert('Wallet connected successfully!');
       } catch (connectError) {
-        console.error('Connection to pre-prod failed, trying mainnet...', connectError);
-        // Fallback to mainnet if pre-prod fails
-        try {
-          await wallet.connect('mainnet');
-          setIsWalletConnected(true);
-          console.log('Wallet connected successfully to mainnet');
-          alert('Wallet connected successfully to mainnet!');
-        } catch (mainnetError) {
-          console.error('Connection to mainnet also failed:', mainnetError);
-          throw mainnetError;
-        }
+        console.error('Connection to preprod failed:', connectError);
+        throw connectError;
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);

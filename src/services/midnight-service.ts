@@ -28,7 +28,7 @@ export class MidnightService {
     private walletApi: ConnectedAPI | null = null;
     private networkConfig = {
         // Pre-Prod Midnight Network endpoints
-        networkId: 'pre-prod',
+        networkId: 'preprod',
         rpcUrl: 'https://rpc.pre-prod.midnight.network',
         explorerUrl: 'https://explorer.pre-prod.midnight.network',
         // 1AM wallet configuration
