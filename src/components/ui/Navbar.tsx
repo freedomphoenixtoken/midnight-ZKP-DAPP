@@ -1,22 +1,19 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, ShieldCheck, FileCheck, Lock, Sparkles, Menu, X, Gift, Heart, Vote, Moon, Sun, Code, ShoppingCart, Activity, DollarSign } from 'lucide-react';
+import { Shield, ShieldCheck, FileCheck, Lock, Sparkles, Menu, X, Gift, Heart, Vote, Moon, Sun, Code, ShoppingCart, Activity, DollarSign, ChevronDown, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 
 export function Navbar() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isZKDropdownOpen, setIsZKDropdownOpen] = useState(false);
+  const [isBusinessDropdownOpen, setIsBusinessDropdownOpen] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   const isActive = (path: string) => location.pathname === path;
 
-  const navItems = [
-    { to: '/', icon: FileCheck, label: 'Home' },
-    { to: '/dashboard', icon: Activity, label: 'Dashboard' },
-    { to: '/marketplace-demo', icon: ShoppingCart, label: 'Demo' },
-    { to: '/widgets', icon: Code, label: 'Widgets' },
-    { to: '/integrations', icon: Code, label: 'Integrations' },
-    { to: '/business', icon: DollarSign, label: 'Business' },
+  const zkProofItems = [
     { to: '/compliance', icon: Shield, label: 'Compliance' },
     { to: '/rental-trust', icon: ShieldCheck, label: 'Rental Trust' },
     { to: '/verify', icon: FileCheck, label: 'Verify' },
@@ -24,6 +21,35 @@ export function Navbar() {
     { to: '/royalty-compliance', icon: Heart, label: 'Royalty' },
     { to: '/governance-power', icon: Vote, label: 'Governance' },
   ];
+
+  const businessItems = [
+    { to: '/dashboard', icon: Activity, label: 'Dashboard' },
+    { to: '/marketplace-demo', icon: ShoppingCart, label: 'Demo' },
+    { to: '/widgets', icon: Code, label: 'Widgets' },
+    { to: '/integrations', icon: Code, label: 'Integrations' },
+    { to: '/business', icon: DollarSign, label: 'Business' },
+  ];
+
+  const connectWallet = async () => {
+    try {
+      // Check if 1AM wallet is available
+      if (typeof window !== 'undefined' && (window as any).midnight) {
+        const wallet = (window as any).midnight['1am'];
+        if (wallet) {
+          await wallet.connect('pre-prod');
+          setIsWalletConnected(true);
+          console.log('Wallet connected successfully');
+        } else {
+          alert('1AM wallet not found. Please install the 1AM wallet extension.');
+        }
+      } else {
+        alert('Midnight wallet not available. Please install the 1AM wallet extension.');
+      }
+    } catch (error) {
+      console.error('Wallet connection failed:', error);
+      alert('Failed to connect wallet. Please try again.');
+    }
+  };
 
   return (
     <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm sticky top-0 z-50 transition-colors duration-200">
@@ -46,26 +72,110 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive(item.to)
-                      ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400 shadow-sm'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {item.label}
-                  {isActive(item.to) && <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400 animate-pulse" />}
-                </Link>
-              );
-            })}
-            
+          <div className="hidden lg:flex items-center gap-1">
+            {/* Home */}
+            <Link
+              to="/"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                isActive('/')
+                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <FileCheck className="w-4 h-4" />
+              Home
+              {isActive('/') && <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400 animate-pulse" />}
+            </Link>
+
+            {/* ZK Proofs Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsZKDropdownOpen(!isZKDropdownOpen)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  zkProofItems.some(item => isActive(item.to))
+                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                ZK Proofs
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {isZKDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 z-50">
+                  {zkProofItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setIsZKDropdownOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                          isActive(item.to)
+                            ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
+                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Business Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsBusinessDropdownOpen(!isBusinessDropdownOpen)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  businessItems.some(item => isActive(item.to))
+                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                <DollarSign className="w-4 h-4" />
+                Business
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {isBusinessDropdownOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 z-50">
+                  {businessItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setIsBusinessDropdownOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                          isActive(item.to)
+                            ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
+                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Connect Wallet Button */}
+            <button
+              onClick={connectWallet}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                isWalletConnected
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-sm'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg'
+              }`}
+            >
+              <Wallet className="w-4 h-4" />
+              {isWalletConnected ? 'Connected' : 'Connect Wallet'}
+            </button>
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -77,7 +187,20 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="lg:hidden flex items-center gap-2">
+            {/* Connect Wallet Button (Mobile) */}
+            <button
+              onClick={connectWallet}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                isWalletConnected
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+              }`}
+            >
+              <Wallet className="w-4 h-4" />
+              {isWalletConnected ? '✓' : <Wallet className="w-4 h-4" />}
+            </button>
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -96,26 +219,68 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-2 animate-fade-in">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive(item.to)
-                      ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400'
-                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Icon className="w-5 h-5" />
-                  {item.label}
-                  {isActive(item.to) && <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-pulse" />}
-                </Link>
-              );
-            })}
+          <div className="lg:hidden py-4 space-y-2 animate-fade-in">
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                isActive('/')
+                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <FileCheck className="w-5 h-5" />
+              Home
+              {isActive('/') && <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-pulse" />}
+            </Link>
+
+            {/* Mobile ZK Proofs Section */}
+            <div className="px-4 py-2">
+              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">ZK Proofs</div>
+              {zkProofItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      isActive(item.to)
+                        ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {item.label}
+                    {isActive(item.to) && <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-pulse" />}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Mobile Business Section */}
+            <div className="px-4 py-2">
+              <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Business</div>
+              {businessItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      isActive(item.to)
+                        ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {item.label}
+                    {isActive(item.to) && <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-pulse" />}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
