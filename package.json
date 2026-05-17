@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:zk": "tsx scripts/test-zk-integration.ts",
-    "seed:demo": "tsx scripts/seed-demo-data.ts"
+    "seed:demo": "tsx scripts/seed-demo-data.ts",
+    "compile:contracts": "compact compile contracts/compliance-passport.compact -o compiled-contracts/compliance-passport && compact compile contracts/rental-trust.compact -o compiled-contracts/rental-trust && compact compile contracts/airdrop-eligibility.compact -o compiled-contracts/airdrop-eligibility && compact compile contracts/royalty-compliance.compact -o compiled-contracts/royalty-compliance && compact compile contracts/governance-power.compact -o compiled-contracts/governance-power"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-js": "^2.5.0",

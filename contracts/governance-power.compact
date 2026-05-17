@@ -1,0 +1,31 @@
+import std::crypto::hash
+import std::convert::u64
+
+// Governance Power ZK Proof
+// Proves voting power without revealing token balance
+
+struct GovernancePowerProof {
+    userDid: ByteArray,
+    tokenBalance: u64,
+    votingWeight: u64,
+    participationHistory: u64,
+    timestamp: u64
+}
+
+public struct GovernancePowerOutput {
+    proofHash: ByteArray,
+    votingPower: u64,
+    isValid: bool
+}
+
+@zkproof
+fn verify_governance_power(input: GovernancePowerProof) -> GovernancePowerOutput {
+    let votingPower = input.tokenBalance * input.votingWeight / 100u64;
+    let isValid = input.tokenBalance >= 100u64 && input.participationHistory >= 5u64;
+    let hash = hash(input.userDid ++ input.tokenBalance ++ input.votingWeight ++ input.participationHistory ++ input.timestamp);
+    GovernancePowerOutput {
+        proofHash: hash,
+        votingPower: votingPower,
+        isValid: isValid
+    }
+}

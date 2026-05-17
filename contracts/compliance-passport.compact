@@ -1,0 +1,27 @@
+import std::crypto::hash
+import std::convert::u64
+
+// Compliance Passport ZK Proof
+// Proves user has KYC status and accreditation level without revealing identity
+
+struct ComplianceProof {
+    userDid: ByteArray,
+    kycStatus: bool,
+    accreditationLevel: u64,
+    timestamp: u64
+}
+
+public struct ComplianceOutput {
+    proofHash: ByteArray,
+    isValid: bool
+}
+
+@zkproof
+fn verify_compliance(input: ComplianceProof) -> ComplianceOutput {
+    let hash = hash(input.userDid ++ input.kycStatus ++ input.accreditationLevel ++ input.timestamp);
+    let isValid = input.kycStatus && input.accreditationLevel >= 1u64;
+    ComplianceOutput {
+        proofHash: hash,
+        isValid: isValid
+    }
+}
