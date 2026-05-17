@@ -12,6 +12,10 @@ import { MarketplaceDemoPage } from './pages/MarketplaceDemoPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { BusinessPage } from './pages/BusinessPage';
+import { ComparisonPage } from './pages/ComparisonPage';
+import { RoadmapPage } from './pages/RoadmapPage';
+import { UseCasesPage } from './pages/UseCasesPage';
+import { ArchitecturePage } from './pages/ArchitecturePage';
 import { ThemeProvider } from './contexts/ThemeContext';
 import './index.css';
 
@@ -35,6 +39,10 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/integrations" element={<IntegrationsPage />} />
               <Route path="/business" element={<BusinessPage />} />
+              <Route path="/comparison" element={<ComparisonPage />} />
+              <Route path="/roadmap" element={<RoadmapPage />} />
+              <Route path="/use-cases" element={<UseCasesPage />} />
+              <Route path="/architecture" element={<ArchitecturePage />} />
             </Routes>
           </main>
         </div>
