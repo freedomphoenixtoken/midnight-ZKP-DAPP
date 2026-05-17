@@ -1,28 +1,10 @@
-import std::crypto::hash
-import std::convert::u64
+pragma language_version >=0.22;
+import CompactStandardLibrary;
 
 // Airdrop Eligibility ZK Proof
 // Proves user eligibility for airdrop without revealing identity
 
-struct AirdropEligibilityProof {
-    userDid: ByteArray,
-    tokenHoldings: u64,
-    minHoldings: u64,
-    holdPeriod: u64,
-    timestamp: u64
-}
-
-public struct AirdropEligibilityOutput {
-    proofHash: ByteArray,
-    isValid: bool
-}
-
-@zkproof
-fn verify_airdrop_eligibility(input: AirdropEligibilityProof) -> AirdropEligibilityOutput {
-    let isValid = input.tokenHoldings >= input.minHoldings && input.holdPeriod >= 30u64;
-    let hash = hash(input.userDid ++ input.tokenHoldings ++ input.minHoldings ++ input.holdPeriod ++ input.timestamp);
-    AirdropEligibilityOutput {
-        proofHash: hash,
-        isValid: isValid
-    }
+export circuit verify_airdrop_eligibility(tokenHoldings: Uint<64>, minHoldings: Uint<64>, holdPeriod: Uint<64>): Boolean {
+    const isValid = tokenHoldings >= minHoldings && holdPeriod >= 30;
+    return isValid;
 }

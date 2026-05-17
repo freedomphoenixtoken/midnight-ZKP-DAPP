@@ -1,34 +1,10 @@
-import std::crypto::hash
-import std::convert::u64
+pragma language_version >=0.22;
+import CompactStandardLibrary;
 
 // Rental Trust Score ZK Proof
 // Proves user's rental history without revealing specific transactions
 
-struct RentalTrustProof {
-    userDid: ByteArray,
-    totalRentals: u64,
-    successfulRentals: u64,
-    onTimeReturns: u64,
-    timestamp: u64
-}
-
-public struct RentalTrustOutput {
-    proofHash: ByteArray,
-    successRate: u64,
-    ontimeRate: u64,
-    isValid: bool
-}
-
-@zkproof
-fn verify_rental_trust(input: RentalTrustProof) -> RentalTrustOutput {
-    let successRate = (input.successfulRentals * 100u64) / input.totalRentals;
-    let ontimeRate = (input.onTimeReturns * 100u64) / input.totalRentals;
-    let isValid = input.totalRentals >= 3u64 && successRate >= 80u64 && ontimeRate >= 90u64;
-    let hash = hash(input.userDid ++ input.totalRentals ++ input.successfulRentals ++ input.onTimeReturns ++ input.timestamp);
-    RentalTrustOutput {
-        proofHash: hash,
-        successRate: successRate,
-        ontimeRate: ontimeRate,
-        isValid: isValid
-    }
+export circuit verify_rental_trust(totalRentals: Uint<64>, successfulRentals: Uint<64>, onTimeReturns: Uint<64>): Boolean {
+    const isValid = totalRentals >= 3 && successfulRentals >= 2 && onTimeReturns >= 2;
+    return isValid;
 }
