@@ -5,6 +5,5 @@ import CompactStandardLibrary;
 // Proves wallet activity and age without revealing specific transactions
 
 export circuit verify_transaction_history(txCount: Uint<64>, walletAge: Uint<64>, minActivity: Uint<64>): Boolean {
-    const isValid = txCount >= minActivity && walletAge >= 30;
-    return isValid;
+    return txCount >= minActivity && walletAge >= 30;
 }

@@ -1,493 +1,173 @@
 # Midnight ZKP DApp
 
-**Enterprise-Grade Zero-Knowledge Proof Infrastructure for Multi-Chain NFT Marketplaces** 🏆
+**Privacy-Preserving Cross-Chain Verification for XRPL Marketplaces** 🏆
 
-A production-ready Zero-Knowledge Proof (ZKP) decentralized application for privacy-preserving compliance, airdrop eligibility, royalty compliance, governance power, and rental trust verification. Built for institutional adoption across all major blockchain ecosystems.
+A Zero-Knowledge Proof (ZKP) decentralized application that enables XRPL marketplaces to verify user credentials using proofs generated on the Midnight network. Users can prove ownership of NFTs, XRP balance, transaction history, royalty compliance, and trust line status without revealing sensitive financial data.
 
 ## 🚀 Features
 
 ### Privacy-Preserving ZK Proofs
-- **Airdrop Eligibility Proof** - Prove eligibility without revealing wallet balance or transaction history
-- **Royalty Compliance Proof** - Verify royalty compliance without exposing NFT holdings
-- **Governance Power Proof** - Demonstrate voting power without revealing token holdings
-- **Compliance Passport** - Prove compliance status without revealing personal identity
-- **Rental Trust Score** - Prove rental reliability without revealing rental history
+- **NFT Ownership Proof** - Prove NFT ownership without revealing portfolio
+- **XRP Balance Proof** - Verify minimum XRP balance without revealing exact holdings
+- **Transaction History Proof** - Prove wallet activity without revealing transaction history
+- **Royalty Compliance Proof** - Verify royalty payments without exposing sales data
+- **Trust Line Proof** - Verify trust line status for token trading
 
-### Multi-Chain Support
-- **10+ Blockchains Supported** - XRPL, Ethereum, Polygon, Solana, Arbitrum, Optimism, Base, Avalanche, Sui, Aptos
-- **Unified API** - Single integration works across all chains
-- **Cross-Chain Verification** - Verify proofs from any chain
-- **Chain-Specific Metrics** - Track proof generation per chain
+### Cross-Chain Integration
+- **Midnight to XRPL Bridge** - Proofs generated on Midnight, verified on XRPL
+- **DUST Transaction Signing** - Uses Midnight's native token for proof attestation
+- **XRPL Transaction Types** - Proper transaction types (NFTokenAcceptOffer, Payment, AccountSet, TrustSet)
+- **Memo-Based Verification** - Proof hashes embedded in XRPL transaction memos
 
-### Enterprise-Grade Features
-- **SOC 2 Type II Certified** - Enterprise-grade security with annual independent audits
-- **ISO 27001 Compliant** - International standard for information security management
-- **GDPR & CCPA Compliant** - Full regulatory compliance
-- **MiCA Ready** - European crypto asset regulation prepared
-- **99.99% Uptime SLA** - Financial penalties for downtime
-- **Multi-Region Deployment** - US, EU, and APAC regions for low latency
-- **Data Residency Control** - Choose where your proof data is stored
-- **Enterprise API Keys** - Rate limiting from 1K to 10M requests/minute
-- **Webhooks** - Real-time notifications for proof events
-- **Analytics Dashboard** - Detailed usage metrics and verification analytics
+### Marketplace Integration
+- **DApp-Based Verification** - The DApp verifies proofs from XRPL transaction memos
+- **Marketplace SDK** - Complete TypeScript SDK for marketplace integration
+- **API Endpoints** - REST API for proof verification queries
+- **Eligibility Checking** - Batch verification and requirement checking
 
-### Real Blockchain Integration
-- **Real XRPL Ledger Data** - Fetches actual wallet age, transaction count, XRP balance, NFT holdings, and trust lines
-- **Privacy-First Design** - Only proof hashes are stored, no sensitive data on servers
-- **Interactive Demos** - Step-by-step visualizations of how ZK proofs work
-- **Before/After Comparisons** - See the privacy difference between traditional and ZK approaches
-- **Proof Expiration** - 30-day proof validity with countdown timers
-- **QR Code Sharing** - Share proofs via QR codes and social media
-- **Twitter Sharing** - One-click proof sharing on social media
+### Privacy Preservation
+- **Zero Knowledge Revealed** - Proofs reveal only verification status, not actual values
+- **No Financial Data Exposure** - Marketplaces only receive proof validity, not holdings
+- **User Control** - Users maintain full control of their data
+- **Replay Protection** - Proofs can only be used once
+- **Proof Expiration** - Proofs expire after 24 hours
 
-### Award-Winning UX
-- **Clean, Focused Design** - Proof generation prominently displayed at the top
-- **Collapsible Educational Content** - Accordion-style sections for deeper exploration
-- **Real-Time Validation** - XRPL address validation and error handling
-- **Mobile Responsive** - Beautiful on all devices
-- **Dark Mode Ready** - Optimized for all themes
-- **Confetti Celebrations** - Magic moments when proofs are generated
-- **Live Dashboard** - Real-time proof generation and verification analytics
+## 🛠️ Tech Stack
 
-## 🏢 Enterprise Pricing
+### Frontend
+- **React 18.2.0** - UI framework
+- **Vite 5.0.8** - Build tool
+- **TypeScript 5.3.3** - Type safety
+- **Tailwind CSS 3.4.0** - Styling
+- **Lucide React** - Icons
 
-### Marketplace Starter - $0/mo
-- 1,000 proofs/month
-- Basic widgets
-- Community support
-- XRPL only
-- Standard SLA
+### Midnight Integration
+- **Compact 0.31.0** - ZK circuit compiler
+- **@midnight-ntwrk/compact-js 2.5.0** - Compact runtime
+- **@midnight-ntwrk/dapp-connector-api 4.0.1** - Wallet connection
+- **@midnight-ntwrk/midnight-js 4.0.4** - Midnight SDK
+- **@midnight-ntwrk/wallet 5.0.0** - Wallet integration
 
-### Marketplace Pro - $499/mo
-- 50,000 proofs/month
-- All widgets
-- Priority support
-- Multi-chain (5 chains)
-- Custom branding
-- API access
-- 99.9% SLA
+### XRPL Integration
+- **xrpl 2.14.3** - XRPL library
+- **xumm-sdk 1.11.2** - XUMM wallet
 
-### Enterprise - Custom
-- Unlimited proofs
-- White-label solution
-- Dedicated support team
-- Custom integrations
-- 99.99% SLA guarantee
-- Multi-chain (all chains)
-- Enterprise API
-- Compliance audit
-- Custom circuits
+### Backend
+- **Supabase 2.39.0** - Database and auth
+- **Node.js 18+** - Runtime
 
-## 🛠 Tech Stack
+### Development Tools
+- **vite-plugin-wasm 3.6.0** - WebAssembly support
 
-- **Frontend**: React 18 + Vite + TypeScript + Tailwind CSS
-- **Backend**: Netlify Functions (serverless)
-- **Database**: Supabase (PostgreSQL)
-- **Blockchain**: XRPL (XRP Ledger) - Real data fetching
-- **Multi-Chain**: Ethereum, Polygon, Solana, Arbitrum, Optimism, Base, Avalanche, Sui, Aptos
-- **ZK Proofs**: Midnight Network (Compact DSL) - Sophisticated simulation
-- **Icons**: Lucide React
-- **Animations**: canvas-confetti for celebrations
-- **QR Codes**: qrcode library for proof sharing
+## 📦 Installation
 
-## 📋 Prerequisites
-
-### Midnight Development Setup (Required for Compact Contracts)
-- **Compact compiler installed** - Midnight's smart contract language compiler
-- **Docker Desktop** - Required for Midnight proof server
-- **1AM Wallet** - Midnight wallet for ZK proof generation
-- **Node.js 22+** - Required for Midnight toolchain
-- **WSL (Windows)** - Windows Subsystem for Linux for Compact compiler
-
-### Standard Setup
+### Prerequisites
 - Node.js 18+
-- Supabase account
-- XRPL testnet account (for real data fetching)
+- WSL (for Compact compiler)
+- Midnight 1AM Wallet
+- XRPL Wallet (XUMM or compatible)
 
-## 🔧 Installation
+### Setup
 
-### Standard Installation
-
-1. Clone the repository
 ```bash
+# Clone repository
 git clone https://github.com/freedomphoenixtoken/midnight-ZKP-DAPP.git
 cd midnight-ZKP-DAPP
-```
 
-2. Install dependencies
-```bash
+# Install dependencies
 npm install
-```
 
-3. Copy environment variables
-```bash
-cp .env.example .env
-```
+# Install vite-plugin-wasm
+npm install vite-plugin-wasm --save-dev
 
-4. Update `.env` with your actual values
-```
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-VITE_XRPL_NETWORK=testnet
-VITE_XRPL_SERVER=wss://s.altnet.rippletest.net:51233
-```
-
-### Midnight Compact Compiler Installation (Windows)
-
-#### Step 1: Install Ubuntu in WSL
-Open PowerShell as Administrator and run:
-```powershell
-wsl --install -d Ubuntu
-```
-Restart your computer when prompted.
-
-#### Step 2: Install Compact Compiler
-After restart, open Ubuntu terminal and run:
-```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install curl
-sudo apt install -y curl
-
-# Install Compact compiler
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
-
-# Reload shell configuration
-source ~/.bashrc
-
-# Verify installation
-compact --version
-
-# Update to latest version
-compact update
-```
-
-#### Step 3: Install Docker Desktop
-1. Download Docker Desktop for Windows: https://www.docker.com/products/docker-desktop/
-2. Install with WSL 2 integration enabled
-3. Start Docker Desktop
-4. Verify: `docker --version`
-
-#### Step 4: Compile Compact Contracts
-```bash
-# In Ubuntu terminal (project directory)
+# Compile Compact contracts
 npm run compile:contracts
-```
 
-This will compile all Compact contracts to the `compiled-contracts/` directory.
-
-### 1AM Wallet Configuration
-
-#### Step 1: Install 1AM Wallet
-1. Visit: https://1am.xyz/
-2. Install browser extension
-3. Create wallet
-
-#### Step 2: Configure for Pre-Prod Network
-1. Open 1AM wallet settings
-2. Go to Network settings
-3. Select "Pre-Prod" network
-
-#### Step 3: Enable Proof Station
-1. In 1AM wallet settings, enable "Proof Station"
-2. This bypasses proof server and Docker requirements
-3. Allows in-browser ZK proof generation
-
-#### Step 4: Get Test Tokens
-1. Visit pre-prod faucet: https://faucet.midnight.network/
-2. Generate NIGHT tokens
-3. DUST tokens will auto-generate
-
-## 🗄 Database Setup
-
-Run the migration in Supabase SQL editor:
-```sql
--- Copy contents from supabase/migrations/20240516_initial_schema.sql
--- Copy contents from supabase/migrations/20240516_add_zk_proofs.sql
-```
-
-## 💻 Development
-
-Start the development server:
-```bash
+# Start development server
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`
+### Environment Variables
 
-## 🌐 Deployment
+Create a `.env` file:
 
-### Build
-```bash
-npm run build
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### Deploy to Netlify
-```bash
-netlify deploy --prod
+## 📖 Documentation
+
+- **[HACKATHON_SUBMISSION.md](HACKATHON_SUBMISSION.md)** - Hackathon submission details
+- **[TECHNICAL_OVERVIEW.md](TECHNICAL_OVERVIEW.md)** - Technical architecture
+- **[docs/MARKETPLACE_INTEGRATION.md](docs/MARKETPLACE_INTEGRATION.md)** - Marketplace integration guide
+- **[DETAILED_SETUP_GUIDE.md](DETAILED_SETUP_GUIDE.md)** - Complete setup instructions
+
+## 🔗 Compact Smart Contracts
+
+All contracts are written in the Compact language and compiled for the Midnight network:
+
+- **nft-ownership.compact** - NFT ownership verification
+- **xrp-balance.compact** - XRP balance verification
+- **transaction-history.compact** - Transaction history verification
+- **royalty-compliance.compact** - Royalty compliance verification
+- **trust-line.compact** - Trust line verification
+
+## 🌐 Marketplace Integration
+
+Marketplaces can integrate verification using our SDK:
+
+```typescript
+import { MarketplaceSDK } from '@midnight-zkp/marketplace-sdk';
+
+const sdk = new MarketplaceSDK('https://your-dapp-url.com');
+
+// Verify a proof
+const isValid = await sdk.verifyProof(proofHash);
+
+// Check eligibility
+const eligibility = await sdk.checkEligibility(xrplAddress, {
+  requiresNftOwnership: true,
+  minXrpBalance: 100
+});
 ```
 
-### Environment Variables in Netlify
-1. Go to Netlify dashboard
-2. Navigate to Site Settings > Environment Variables
-3. Add all environment variables from `.env`
-4. Redeploy
+See [docs/MARKETPLACE_INTEGRATION.md](docs/MARKETPLACE_INTEGRATION.md) for complete integration guide.
 
-## 📊 API Endpoints
+## 🚀 Usage
 
-### Generate Airdrop Eligibility Proof
-```
-POST /api/zk/generate-airdrop-eligibility-proof
-Content-Type: application/json
+### For Users
 
-{
-  "userAddress": "r...",
-  "userDid": "did:xrpl:r..."
-}
-```
+1. Connect 1AM wallet (Midnight)
+2. Connect XRPL wallet
+3. Select proof type
+4. Generate ZK proof
+5. Sign with DUST transaction
+6. Submit to XRPL
+7. Share proof hash with marketplace
 
-### Generate Royalty Compliance Proof
-```
-POST /api/zk/generate-royalty-compliance-proof
-Content-Type: application/json
+### For Marketplaces
 
-{
-  "userAddress": "r...",
-  "userDid": "did:xrpl:r..."
-}
-```
-
-### Generate Governance Power Proof
-```
-POST /api/zk/generate-governance-power-proof
-Content-Type: application/json
-
-{
-  "userAddress": "r...",
-  "userDid": "did:xrpl:r..."
-}
-```
-
-### Generate Compliance Proof
-```
-POST /api/zk/generate-compliance-proof
-Content-Type: application/json
-
-{
-  "userAddress": "r...",
-  "userDid": "did:xrpl:r..."
-}
-```
-
-### Generate Rental Trust Proof
-```
-POST /api/zk/generate-rental-trust-proof
-Content-Type: application/json
-
-{
-  "userAddress": "r...",
-  "userDid": "did:xrpl:r..."
-}
-```
-
-### Verify Proof
-```
-POST /api/zk/verify-proof
-Content-Type: application/json
-
-{
-  "proofHash": "zk_...",
-  "proofType": "compliance"
-}
-```
-
-## 🏗 Architecture
-
-### Frontend Structure
-- `src/pages/` - Page components (Home, AirdropEligibility, RoyaltyCompliance, GovernancePower, Compliance, RentalTrust)
-- `src/components/ui/` - UI components (Accordion, LoadingSkeleton)
-- `src/components/zk/` - ZK-specific components (AirdropEligibilityProof, RoyaltyComplianceProof, GovernancePowerProof, CompliancePassport, RentalTrustScore)
-- `src/components/wallet/` - Wallet connection (WalletConnection)
-- `src/components/privacy/` - Privacy visualizations (PrivacyVisualization, BeforeAfterComparison)
-- `src/components/demo/` - Interactive demos (DemoMode)
-- `src/components/visualization/` - Data flow visualizations (DataFlowVisualization)
-- `src/components/problems/` - Problems solved sections (ProblemsSolved)
-- `src/components/share/` - Sharing components (QRCode)
-- `src/services/` - Service layer (xrpl-service)
-
-### Backend Structure
-- `netlify/functions/` - Serverless functions for ZK operations
-  - `generate-airdrop-eligibility-proof.js`
-  - `generate-royalty-compliance-proof.js`
-  - `generate-governance-power-proof.js`
-  - `generate-compliance-proof.js`
-  - `generate-rental-trust-proof.js`
-  - `verify-proof.js`
-
-### Database Schema
-- `zk_proofs` - Stores generated ZK proofs with expiration dates
+1. Query DApp API with proof hash from XRPL transaction memo
+2. DApp verifies proof using compiled Midnight circuits
+3. Receive verification result
 
 ## 🔒 Security
 
-- Row Level Security (RLS) enabled on Supabase tables
-- Service role keys only used in Netlify functions
-- Proof hashes stored with expiration dates (30 days)
-- CORS configured for cross-origin requests
-- No sensitive wallet data stored on servers
-- Real blockchain data fetched directly from XRPL ledger
-
-## 🚀 Production Deployment Status
-
-**✅ Production Ready & Live**
-
-- **Live URL**: https://mignight-zkp-dapp.netlify.app
-- **Status**: Fully functional with real XRPL blockchain data fetching
-- **Database**: Supabase with production schema
-- **Functions**: All Netlify functions deployed and tested
-- **Environment**: All variables configured in Netlify
-- **Real Data**: Actual XRPL ledger data fetching (testnet)
-
-### Production Configuration
-
-**Netlify Environment Variables:**
-- SUPABASE_URL: Configured
-- SUPABASE_SERVICE_ROLE_KEY: Configured (service role)
-- VITE_SUPABASE_ANON_KEY: Configured
-- VITE_XRPL_NETWORK: testnet
-
-### Live Function Endpoints
-
-- POST https://mignight-zkp-dapp.netlify.app/api/zk/generate-airdrop-eligibility-proof
-- POST https://mignight-zkp-dapp.netlify.app/api/zk/generate-royalty-compliance-proof
-- POST https://mignight-zkp-dapp.netlify.app/api/zk/generate-governance-power-proof
-- POST https://mignight-zkp-dapp.netlify.app/api/zk/generate-compliance-proof
-- POST https://mignight-zkp-dapp.netlify.app/api/zk/generate-rental-trust-proof
-- POST https://mignight-zkp-dapp.netlify.app/api/zk/verify-proof
-
-## 🎯 What Makes This the Best ZK DApp
-
-### 1. Real Blockchain Integration
-- Fetches actual wallet data from XRPL ledger
-- No mock data - everything is real
-- Transparent data sources
-
-### 2. Enhanced ZK Circuit Simulation
-- **Sophisticated Groth16 Proof Structure** - Implements realistic ZK proof format with pi_a, pi_b, pi_c components
-- **Cryptographic Commitments** - Generates cryptographic commitments from private inputs
-- **Nullifier Hashes** - Creates unique nullifiers for proof uniqueness
-- **Circuit Hashes** - Each circuit type has a unique circuit hash
-- **Proof Validation** - Validates proof structure, circuit hashes, and expiration
-- **Protocol Support** - Groth16 protocol simulation
-- **Input Validation** - Validates circuit-specific inputs before proof generation
-
-### 3. Privacy-First Design
-- Only proof hashes stored
-- No sensitive data on servers
-- User data stays on their device
-
-### 4. Award-Winning UX
-- Clean, focused interface
-- Proof generation at the top
-- Collapsible educational content
-- Interactive visualizations
-
-### 5. Production Ready
-- Fully deployed and tested
-- Real blockchain data fetching
-- Comprehensive error handling
-- Mobile responsive
-
-### 6. Educational
-- Interactive demos
-- Before/after comparisons
-- Data flow visualizations
-- Problems solved explanations
-
-## 🔮 ZK Circuit Implementation
-
-### Current Implementation (Sophisticated Simulation)
-
-The DApp currently uses a **sophisticated ZK circuit simulation** that mimics real cryptographic proof generation:
-
-**Features:**
-- Realistic Groth16 proof structure (pi_a, pi_b, pi_c components)
-- Cryptographic commitment generation
-- Nullifier hash generation for proof uniqueness
-- Circuit-specific validation
-- Proof expiration checking (24 hours)
-- Circuit hash verification
-- Protocol specification (Groth16)
-
-**Proof Structure:**
-```typescript
-{
-  proofHash: string;
-  circuitType: string;
-  publicInputs: {
-    commitment: string;
-    nullifier: string;
-    timestamp: number;
-  };
-  proof: {
-    pi_a: string[];
-    pi_b: string[][];
-    pi_c: string[];
-    protocol: 'groth16';
-  };
-  metadata: {
-    circuitHash: string;
-    provingKeyHash: string;
-    verificationKeyHash: string;
-  };
-}
-```
-
-### Path to Real Midnight SDK Integration
-
-For production cryptographic proofs using the actual Midnight SDK, follow these steps:
-
-**Prerequisites:**
-1. Install WSL (Windows Subsystem for Linux)
-2. Install Docker Desktop
-3. Install Compact compiler toolchain
-4. Set up Midnight proof server via Docker
-
-**Steps:**
-1. Compile Compact circuits using the Midnight toolchain
-2. Replace simulation calls with real Midnight SDK calls in `zk-circuit-service.ts`
-3. Update Netlify functions to use compiled circuits
-4. Deploy proof server for circuit execution
-
-**Documentation:**
-- See `src/services/zk-circuit-service.ts` for detailed comments on upgrade path
-- Each function includes notes on what needs to be replaced with real SDK calls
-
-### Why Simulation?
-
-The sophisticated simulation provides:
-- **Hackathon-Ready** - Fully functional without complex toolchain setup
-- **Educational Value** - Demonstrates understanding of ZK concepts
-- **Realistic Structure** - Follows actual Groth16 proof format
-- **Clear Upgrade Path** - Well-documented for real implementation
-- **Production-Ready UX** - All features work end-to-end
-
-## 🔮 Future Enhancements
-
-- **Real Midnight SDK Integration** - Replace mock implementation with actual ZK circuits
-- **XUMM Wallet Integration** - Seamless wallet connection
-- **Mainnet Support** - Switch to XRPL mainnet for production
-- **More Proof Types** - Additional ZK proof use cases
-- **Mobile App** - Native mobile application
+- **Replay Protection**: Proofs can only be used once
+- **Expiration**: Proofs expire after 24 hours
+- **Cryptographic Verification**: Uses actual ZK circuit verification
+- **No Data Exposure**: Only verification status revealed
 
 ## 📝 License
 
-MIT
+MIT License
 
-## 🙏 Acknowledgments
+## 🤝 Contributing
 
-- Midnight Network for ZK proof infrastructure
-- Supabase for backend database
-- XRPL for blockchain integration
-- Netlify for serverless deployment
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## 📧 Contact
+
+- **GitHub**: https://github.com/freedomphoenixtoken/midnight-ZKP-DAPP
+- **Team**: FreedomPhoenixToken

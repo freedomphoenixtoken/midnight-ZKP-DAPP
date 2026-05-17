@@ -5,6 +5,5 @@ import CompactStandardLibrary;
 // Proves minimum XRP balance for transaction fees without revealing exact amount
 
 export circuit verify_xrp_balance(xrpBalance: Uint<64>, minBalance: Uint<64>, reserveRequirement: Uint<64>): Boolean {
-    const isValid = xrpBalance >= minBalance && xrpBalance >= reserveRequirement;
-    return isValid;
+    return xrpBalance >= minBalance && xrpBalance >= reserveRequirement;
 }

@@ -5,6 +5,5 @@ import CompactStandardLibrary;
 // Proves trust line status for token trading without revealing amounts
 
 export circuit verify_trust_line(trustLineCount: Uint<64>, hasRequiredTrust: Boolean, minTrustLines: Uint<64>): Boolean {
-    const isValid = trustLineCount >= minTrustLines && hasRequiredTrust;
-    return isValid;
+    return trustLineCount >= minTrustLines && hasRequiredTrust;
 }

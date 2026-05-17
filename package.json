@@ -11,10 +11,11 @@
     "preview": "vite preview",
     "test:zk": "tsx scripts/test-zk-integration.ts",
     "seed:demo": "tsx scripts/seed-demo-data.ts",
-    "compile:contracts": "wsl bash -c \"/home/freedomphoenix/.local/bin/compact compile contracts/nft-ownership.compact compiled-contracts/nft-ownership && /home/freedomphoenix/.local/bin/compact compile contracts/xrp-balance.compact compiled-contracts/xrp-balance && /home/freedomphoenix/.local/bin/compact compile contracts/transaction-history.compact compiled-contracts/transaction-history && /home/freedomphoenix/.local/bin/compact compile contracts/royalty-compliance.compact compiled-contracts/royalty-compliance && /home/freedomphoenix/.local/bin/compact compile contracts/trust-line.compact compiled-contracts/trust-line\""
+    "compile:contracts": "wsl bash -c \"/home/freedomphoenix/.local/bin/compactc.bin contracts/nft-ownership.compact compiled-contracts/nft-ownership && /home/freedomphoenix/.local/bin/compactc.bin contracts/xrp-balance.compact compiled-contracts/xrp-balance && /home/freedomphoenix/.local/bin/compactc.bin contracts/transaction-history.compact compiled-contracts/transaction-history && /home/freedomphoenix/.local/bin/compactc.bin contracts/royalty-compliance.compact compiled-contracts/royalty-compliance && /home/freedomphoenix/.local/bin/compactc.bin contracts/trust-line.compact compiled-contracts/trust-line\""
   },
   "dependencies": {
     "@midnight-ntwrk/compact-js": "^2.5.0",
+    "@midnight-ntwrk/compact-runtime": "^0.16.0",
     "@midnight-ntwrk/dapp-connector-api": "^4.0.1",
     "@midnight-ntwrk/midnight-js": "^4.0.4",
     "@midnight-ntwrk/wallet": "^5.0.0",
@@ -43,6 +44,7 @@
     "tailwindcss": "^3.4.0",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vite-plugin-wasm": "^3.6.0"
   }
 }

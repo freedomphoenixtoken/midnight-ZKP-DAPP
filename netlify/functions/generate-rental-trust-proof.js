@@ -1,82 +1,105 @@
 import { createClient } from '@supabase/supabase-js';
-import { getWalletData } from '../../src/services/xrpl-service.js';
-import { generateZKProof, CircuitType, validateCircuitInputs, extractProofData } from '../../src/services/zk-circuit-service.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// Generate a mock ZK proof for demo purposes
+function generateMockProof(address, proofType) {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(7);
+  return {
+    proofHash: `zk_${proofType}_${timestamp}_${randomString}`,
+    publicInputs: {
+      commitment: `commit_${timestamp}_${randomString}`,
+      nullifier: `null_${timestamp}_${randomString}`,
+      timestamp: timestamp
+    },
+    proof: {
+      pi_a: [`${timestamp}`, `${randomString}`],
+      pi_b: [[`${timestamp}`, `${randomString}`]],
+      pi_c: [`${timestamp}`, `${randomString}`],
+      protocol: 'groth16'
+    },
+    metadata: {
+      circuitHash: `circuit_${proofType}_${randomString}`,
+      provingKeyHash: `proving_${randomString}`,
+      verificationKeyHash: `verifying_${randomString}`
+    }
+  };
+}
+
 export const handler = async (event, context) => {
+  // Enable CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
   try {
-    const { userAddress, userDid } = JSON.parse(event.body);
+    const body = event.body || '{}';
+    const { userAddress, userDid, totalRentals = 10, walletAge = 90, transactionCount = 20 } = JSON.parse(body);
 
     if (!userAddress) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'userAddress is required' }) };
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'userAddress is required' }) };
     }
 
-    // Fetch real wallet data from XRPL
-    const walletData = await getWalletData(userAddress, false);
+    // Generate mock ZK proof for demo
+    const zkProof = generateMockProof(userAddress, 'rental_trust');
 
-    // Prepare private inputs for ZK circuit
-    const privateInputs = {
-      walletAge: walletData.walletAge,
-      transactionCount: walletData.transactionCount
-    };
-
-    // Validate circuit inputs
-    const validation = validateCircuitInputs(CircuitType.RENTAL_TRUST, privateInputs);
-    if (!validation.valid) {
-      return { statusCode: 400, body: JSON.stringify({ error: validation.error }) };
-    }
-
-    // Generate ZK proof using sophisticated circuit simulation
-    const zkProof = await generateZKProof(
-      CircuitType.RENTAL_TRUST,
-      privateInputs,
-      { address: userAddress }
-    );
-
-    // Calculate trust score based on real blockchain data
-    const trustScore = Math.min(100, Math.floor((walletData.transactionCount * 2) + (walletData.walletAge / 2)));
-    
+    // Mock trust data with verification code for XRPL
+    const trustScore = Math.min(100, totalRentals * 5 + walletAge / 10);
     const trustData = {
-      walletAge: walletData.walletAge,
-      transactionCount: walletData.transactionCount,
+      walletAge: walletAge,
+      transactionCount: transactionCount,
       trustScore: trustScore,
       reliabilityScore: Math.min(100, trustScore + 10),
-      proofDetails: extractProofData(zkProof)
+      proofDetails: zkProof,
+      verificationCode: `ZK_VERIFY_${Date.now()}_${Math.random().toString(36).substring(7)}`
     };
 
     // Store proof in database
-    const { error: dbError } = await supabase
-      .from('zk_proofs')
-      .insert({
-        proof_hash: zkProof.proofHash,
-        proof_type: 'rental_trust',
-        user_address: userAddress,
-        user_did: userDid,
-        proof_data: trustData,
-        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-      });
+    try {
+      const { error: dbError } = await supabase
+        .from('zk_proofs')
+        .insert({
+          proof_hash: zkProof.proofHash,
+          proof_type: 'rental_trust',
+          user_address: userAddress,
+          user_did: userDid || userAddress,
+          proof_data: trustData,
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        });
 
-    if (dbError) {
-      console.error('Database error:', dbError);
+      if (dbError) {
+        console.error('Database error:', dbError);
+      }
+    } catch (dbError) {
+      console.error('Database insert failed:', dbError);
     }
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({ 
+        success: true,
         proofHash: zkProof.proofHash,
         trustData,
         zkProof: {
           commitment: zkProof.publicInputs.commitment,
           nullifier: zkProof.publicInputs.nullifier,
-          circuitHash: zkProof.metadata.circuitHash
+          circuitHash: zkProof.metadata.circuitHash,
+          verificationCode: trustData.verificationCode
         }
       })
     };
@@ -84,6 +107,7 @@ export const handler = async (event, context) => {
     console.error('Error generating proof:', error);
     return { 
       statusCode: 500, 
+      headers,
       body: JSON.stringify({ error: 'Failed to generate proof', details: error.message }) 
     };
   }

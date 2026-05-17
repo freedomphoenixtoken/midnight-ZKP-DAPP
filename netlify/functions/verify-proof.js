@@ -1,21 +1,39 @@
 import { createClient } from '@supabase/supabase-js';
-import { verifyZKProof } from '../../src/services/zk-circuit-service.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// Mock ZK proof verification for demo
+function verifyMockProof(proofHash) {
+  // In production, this would use the actual Midnight circuit verification
+  // For demo, we'll just check if the proof hash exists and is valid format
+  return proofHash && proofHash.startsWith('zk_');
+}
+
 export const handler = async (event) => {
+  // Enable CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
   try {
-    const { proofHash, proofType } = JSON.parse(event.body || '{}');
+    const body = event.body || '{}';
+    const { proofHash, proofType } = JSON.parse(body);
 
     if (!proofHash || !proofType) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing required fields' }) };
     }
 
     const { data: proofRecord, error } = await supabase
@@ -26,51 +44,36 @@ export const handler = async (event) => {
       .single();
 
     if (error || !proofRecord) {
-      return { statusCode: 404, body: JSON.stringify({ error: 'Proof not found' }) };
+      return { statusCode: 404, headers, body: JSON.stringify({ error: 'Proof not found' }) };
     }
 
     // Check if proof is expired
     if (proofRecord.expires_at && new Date(proofRecord.expires_at) < new Date()) {
-      return { statusCode: 400, body: JSON.stringify({ valid: false, reason: 'Proof expired' }) };
+      return { statusCode: 400, headers, body: JSON.stringify({ valid: false, reason: 'Proof expired' }) };
     }
 
     // Check if proof is revoked
     if (proofRecord.is_revoked) {
-      return { statusCode: 400, body: JSON.stringify({ valid: false, reason: 'Proof revoked' }) };
+      return { statusCode: 400, headers, body: JSON.stringify({ valid: false, reason: 'Proof revoked' }) };
     }
 
-    // Verify ZK proof using enhanced verification logic
-    const zkProof = {
-      proofHash: proofRecord.proof_hash,
-      circuitType: proofRecord.proof_type,
-      publicInputs: proofRecord.proof_data?.proofDetails || {},
-      proof: {
-        pi_a: [],
-        pi_b: [],
-        pi_c: [],
-        protocol: 'groth16'
-      },
-      metadata: {
-        circuitHash: proofRecord.proof_data?.proofDetails?.circuit_hash || '',
-        provingKeyHash: '',
-        verificationKeyHash: ''
-      }
-    };
-
-    const isValid = await verifyZKProof(zkProof, { address: proofRecord.user_address });
+    // Verify ZK proof using mock verification
+    const isValid = verifyMockProof(proofRecord.proof_hash);
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         valid: isValid,
         userAddress: proofRecord.user_address,
         createdAt: proofRecord.created_at,
         expiresAt: proofRecord.expires_at,
-        proofDetails: proofRecord.proof_data?.proofDetails
+        proofDetails: proofRecord.proof_data?.proofDetails,
+        verificationCode: proofRecord.proof_data?.verificationCode
       })
     };
   } catch (error) {
     console.error('Error verifying proof:', error);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Failed to verify proof', details: error.message }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to verify proof', details: error.message }) };
   }
 };

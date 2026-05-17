@@ -5,6 +5,5 @@ import CompactStandardLibrary;
 // Proves creator royalty compliance without revealing specific NFT sales
 
 export circuit verify_royalty_compliance(totalSales: Uint<64>, royaltyPaid: Uint<64>, royaltyRate: Uint<64>): Boolean {
-    const isValid = royaltyPaid >= 1 && totalSales >= 1 && royaltyRate >= 1;
-    return isValid;
+    return royaltyPaid >= 1 && totalSales >= 1 && royaltyRate >= 1;
 }

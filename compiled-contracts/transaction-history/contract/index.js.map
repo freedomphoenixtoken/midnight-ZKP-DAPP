@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.js",
+  "sourceRoot": "../../../",
+  "sources": ["contracts/transaction-history.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAAA;;;;;;;;;;MAMA,AAAA,0BAEC;;OAAA;;;;GACA;EATD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;GASC;EAHD,AAAA,6BAEC,CAFyC,SAAiB,EAAE,WAAmB,EAAE,aAAqB;WAC5F,SAAO,IAAI,aAAW,IAAI,WAAS;GAC7C;;;;;;;;;;;;;;;;;;;;;;;EAFD,AAAA,0BAEC;;;;UAFyC,SAAiB;UAAE,WAAmB;UAAE,aAAqB;;;;;;;;;;;;;;;;;;;;;;wDAA7D,SAAiB;wDAAE,WAAmB;wDAAE,aAAqB;GAEtG;;;;"
+}

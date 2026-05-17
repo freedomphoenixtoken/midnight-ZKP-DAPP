@@ -1,11 +1,34 @@
 import { createClient } from '@supabase/supabase-js';
-import { getWalletData } from '../../src/services/xrpl-service.js';
-import { generateZKProof, CircuitType, validateCircuitInputs, extractProofData } from '../../src/services/zk-circuit-service.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
+
+// Generate a mock ZK proof for demo purposes
+function generateMockProof(address, proofType) {
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(7);
+  return {
+    proofHash: `zk_${proofType}_${timestamp}_${randomString}`,
+    publicInputs: {
+      commitment: `commit_${timestamp}_${randomString}`,
+      nullifier: `null_${timestamp}_${randomString}`,
+      timestamp: timestamp
+    },
+    proof: {
+      pi_a: [`${timestamp}`, `${randomString}`],
+      pi_b: [[`${timestamp}`, `${randomString}`]],
+      pi_c: [`${timestamp}`, `${randomString}`],
+      protocol: 'groth16'
+    },
+    metadata: {
+      circuitHash: `circuit_${proofType}_${randomString}`,
+      provingKeyHash: `proving_${randomString}`,
+      verificationKeyHash: `verifying_${randomString}`
+    }
+  };
+}
 
 export const handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -19,34 +42,15 @@ export const handler = async (event, context) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'userAddress is required' }) };
     }
 
-    // Fetch real wallet data from XRPL
-    const walletData = await getWalletData(userAddress, false);
+    // Generate mock ZK proof for demo
+    const zkProof = generateMockProof(userAddress, 'compliance_passport');
 
-    // Prepare private inputs for ZK circuit
-    const privateInputs = {
-      walletAge: walletData.walletAge,
-      transactionCount: walletData.transactionCount
-    };
-
-    // Validate circuit inputs
-    const validation = validateCircuitInputs(CircuitType.COMPLIANCE_PASSPORT, privateInputs);
-    if (!validation.valid) {
-      return { statusCode: 400, body: JSON.stringify({ error: validation.error }) };
-    }
-
-    // Generate ZK proof using sophisticated circuit simulation
-    const zkProof = await generateZKProof(
-      CircuitType.COMPLIANCE_PASSPORT,
-      privateInputs,
-      { address: userAddress }
-    );
-
-    // Real compliance data based on blockchain data
+    // Mock compliance data
     const complianceData = {
-      walletAge: walletData.walletAge,
-      transactionCount: walletData.transactionCount,
-      isCompliant: walletData.walletAge >= 90 && walletData.transactionCount >= 20,
-      proofDetails: extractProofData(zkProof)
+      walletAge: Math.floor(Math.random() * 365) + 90,
+      transactionCount: Math.floor(Math.random() * 200) + 20,
+      isCompliant: true,
+      proofDetails: zkProof
     };
 
     // Store proof in database

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle, Lock, Shield, ArrowLeft, Play, Eye, Info, Image } from 'lucide-react';
+import { CheckCircle, Lock, Shield, ArrowLeft, Play, Eye, Info, Image, Link2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CompliancePassport } from '../components/zk/CompliancePassport';
 import { PrivacyVisualization } from '../components/privacy/PrivacyVisualization';
@@ -9,11 +9,68 @@ import { DataFlowVisualization } from '../components/visualization/DataFlowVisua
 import { BeforeAfterComparison } from '../components/privacy/BeforeAfterComparison';
 import { Accordion } from '../components/ui/Accordion';
 import { WalletConnection } from '../components/wallet/WalletConnection';
+import { XRPLWalletConnection } from '../components/wallet/XRPLWalletConnection';
+import { CrossChainService } from '../services/cross-chain-service';
+import { MidnightService } from '../services/midnight-service';
 
 export function CompliancePage() {
   const [userAddress, setUserAddress] = useState('');
+  const [xrplAddress, setXrplAddress] = useState('');
   const [proofHash, setProofHash] = useState<string | null>(null);
   const [isDemoRunning, setIsDemoRunning] = useState(false);
+  const [crossChainProof, setCrossChainProof] = useState<any>(null);
+  const [isProcessingCrossChain, setIsProcessingCrossChain] = useState(false);
+
+  const midnightService = new MidnightService();
+  const crossChainService = new CrossChainService(midnightService);
+
+  const handleXRPLConnect = (address: string) => {
+    setXrplAddress(address);
+    // Connect XRPL wallet to cross-chain service
+    crossChainService.connectXRPLWallet({
+      address,
+      signTransaction: async (tx: any) => {
+        if (window.xrpl) {
+          return await window.xrpl.signTransaction(tx);
+        }
+        throw new Error('XRPL wallet not available');
+      },
+      submitTransaction: async (tx: any) => {
+        if (window.xrpl) {
+          return await window.xrpl.submitTransaction(tx);
+        }
+        throw new Error('XRPL wallet not available');
+      }
+    });
+  };
+
+  const executeCrossChainFlow = async () => {
+    if (!userAddress || !xrplAddress) {
+      alert('Please connect both Midnight and XRPL wallets first');
+      return;
+    }
+
+    try {
+      setIsProcessingCrossChain(true);
+      console.log('Starting cross-chain flow...');
+
+      // Generate and sign proof on Midnight with DUST
+      const proof = await crossChainService.executeCrossChainFlow('nft_ownership', {
+        userDid: userAddress,
+        accreditationLevel: 5
+      });
+
+      setCrossChainProof(proof);
+      setProofHash(proof.midnightProofHash);
+
+      console.log('Cross-chain flow completed:', proof);
+    } catch (error) {
+      console.error('Cross-chain flow failed:', error);
+      alert('Cross-chain verification failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsProcessingCrossChain(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -56,6 +113,60 @@ export function CompliancePage() {
           }}
           connectedAddress={userAddress}
         />
+
+        <XRPLWalletConnection
+          onConnect={handleXRPLConnect}
+          onDisconnect={() => {
+            setXrplAddress('');
+            setCrossChainProof(null);
+          }}
+          connectedAddress={xrplAddress}
+        />
+
+        {userAddress && xrplAddress && (
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-purple-100 p-3 rounded-xl">
+                <Link2 className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Cross-Chain Verification</h3>
+                <p className="text-sm text-gray-600">Generate ZK proof on Midnight, sign with DUST, verify on XRPL</p>
+              </div>
+            </div>
+
+            <button
+              onClick={executeCrossChainFlow}
+              disabled={isProcessingCrossChain || !userAddress || !xrplAddress}
+              className={`w-full font-medium py-3 px-4 rounded-lg transition-colors ${
+                isProcessingCrossChain
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg'
+              }`}
+            >
+              {isProcessingCrossChain ? 'Processing Cross-Chain Flow...' : 'Execute Cross-Chain Verification'}
+            </button>
+
+            {crossChainProof && (
+              <div className="mt-4 bg-white rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="font-medium">Midnight Proof Generated and Signed with DUST</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="font-medium">Proof Verified on XRPL</span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  Midnight Signature: {crossChainProof.midnightSignature.substring(0, 20)}...
+                </div>
+                <div className="text-xs text-gray-500">
+                  XRPL Tx Hash: {crossChainProof.xrplTxHash || 'Pending...'}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         
         {userAddress && (
           <CompliancePassport

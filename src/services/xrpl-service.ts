@@ -183,3 +183,48 @@ export async function extractProofTypeFromTransaction(tx: any): Promise<string |
         return null;
     }
 }
+
+export async function sendVerificationCodeTransaction(
+    client: Client,
+    wallet: Wallet,
+    verificationCode: string,
+    destinationAddress?: string,
+    amount: string = '1'
+): Promise<any> {
+    const transaction: Transaction = {
+        TransactionType: 'Payment',
+        Account: wallet.address,
+        Amount: amount,
+        Destination: destinationAddress || wallet.address,
+        Memos: [{
+            Memo: {
+                MemoData: Buffer.from(verificationCode).toString('hex').substring(0, 2048),
+                MemoFormat: Buffer.from('VERIFICATION_CODE').toString('hex'),
+                MemoType: Buffer.from('ZK_IDENTITY').toString('hex')
+            }
+        }]
+    };
+
+    const prepared = await client.autofill(transaction);
+    const signed = wallet.sign(prepared);
+    const result = await client.submitAndWait(signed.tx_blob);
+    
+    return result;
+}
+
+export async function extractVerificationCodeFromTransaction(tx: any): Promise<string | null> {
+    if (!tx.Memos || tx.Memos.length === 0) return null;
+    
+    const memo = tx.Memos[0];
+    if (!memo.Memo || !memo.Memo.MemoData) return null;
+    
+    try {
+        const memoFormat = memo.Memo.MemoFormat ? Buffer.from(memo.Memo.MemoFormat, 'hex').toString('utf8') : '';
+        if (memoFormat === 'VERIFICATION_CODE') {
+            return Buffer.from(memo.Memo.MemoData, 'hex').toString('utf8');
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}

@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.js",
+  "sourceRoot": "../../../",
+  "sources": ["contracts/royalty-compliance.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAAA;;;;;;;;;;MAMA,AAAA,yBAEC;;OAAA;;;;GACA;EATD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;GASC;EAHD,AAAA,4BAEC,CAFwC,YAAoB,EAAE,aAAqB,EAAE,aAAqB;WAChG,aAAW,UAAS,YAAU,UAAS,aAAW;GAC5D;;;;;;;;;;;;;;;;;;;;;;;EAFD,AAAA,yBAEC;;;;UAFwC,YAAoB;UAAE,aAAqB;UAAE,aAAqB;;;;;;;;;;;;;;;;;;;;;;uDAAlE,YAAoB;uDAAE,aAAqB;uDAAE,aAAqB;GAE1G;;;;"
+}

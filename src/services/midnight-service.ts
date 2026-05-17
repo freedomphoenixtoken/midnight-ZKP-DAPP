@@ -166,7 +166,7 @@ export class MidnightService {
         };
     }
 
-    async generateAirdropEligibilityProof(tokenHoldings: number, minHoldings: number, holdPeriod: number): Promise<any> {
+    async generateAirdropEligibilityProof(tokenHoldings: number, _minHoldings: number, holdPeriod: number): Promise<any> {
         // Use the compiled Compact circuit for transaction history verification
         try {
             const isValid = transactionHistoryCircuits.verify_transaction_history(
@@ -239,7 +239,7 @@ export class MidnightService {
         }
     }
 
-    async generateGovernancePowerProof(tokenBalance: number, votingWeight: number, participationHistory: number): Promise<any> {
+    async generateGovernancePowerProof(tokenBalance: number, _votingWeight: number, _participationHistory: number): Promise<any> {
         // Use the compiled Compact circuit for trust line verification
         try {
             const isValid = trustLineCircuits.verify_trust_line(
