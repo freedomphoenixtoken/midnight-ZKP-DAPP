@@ -1,9 +1,9 @@
 import type { ComplianceProofInput, RentalTrustProofInput } from '../zk/proofs/proof-utils';
-import { pureCircuits as complianceCircuits } from '../../compiled-contracts/compliance-passport/contract/index';
-import { pureCircuits as rentalTrustCircuits } from '../../compiled-contracts/rental-trust/contract/index';
-import { pureCircuits as airdropEligibilityCircuits } from '../../compiled-contracts/airdrop-eligibility/contract/index';
+import { pureCircuits as nftOwnershipCircuits } from '../../compiled-contracts/nft-ownership/contract/index';
+import { pureCircuits as xrpBalanceCircuits } from '../../compiled-contracts/xrp-balance/contract/index';
+import { pureCircuits as transactionHistoryCircuits } from '../../compiled-contracts/transaction-history/contract/index';
 import { pureCircuits as royaltyComplianceCircuits } from '../../compiled-contracts/royalty-compliance/contract/index';
-import { pureCircuits as governancePowerCircuits } from '../../compiled-contracts/governance-power/contract/index';
+import { pureCircuits as trustLineCircuits } from '../../compiled-contracts/trust-line/contract/index';
 
 // DApp Connector API types (from @midnight-ntwrk/dapp-connector-api)
 interface ConnectedAPI {
@@ -75,27 +75,27 @@ export class MidnightService {
         const wallet = await this.ensureWalletConnected();
         if (wallet) {
             try {
-                // Use the compiled Compact circuit for compliance verification
-                const isValid = complianceCircuits.verify_compliance(
-                    input.kycStatus,
-                    BigInt(input.accreditationLevel)
+                // Use the compiled Compact circuit for NFT ownership verification
+                const isValid = nftOwnershipCircuits.verify_nft_ownership(
+                    BigInt(input.accreditationLevel),
+                    BigInt(1),
+                    BigInt(30)
                 );
                 
-                console.log('Compliance circuit executed successfully:', isValid);
+                console.log('NFT ownership circuit executed successfully:', isValid);
                 
                 return {
                     proof: {
-                        compliance_valid: isValid,
-                        accreditation_level: input.accreditationLevel,
+                        nft_ownership_valid: isValid,
+                        nft_count: input.accreditationLevel,
                         timestamp: input.verificationTimestamp,
                         publicInputs: {
                             userDid: input.userDid,
-                            kycStatus: input.kycStatus,
-                            accreditationLevel: input.accreditationLevel
+                            nftCount: input.accreditationLevel
                         },
                         wallet: '1am'
                     },
-                    proofHash: this.generateMockHash(input.userDid, 'compliance'),
+                    proofHash: this.generateMockHash(input.userDid, 'nft_ownership'),
                     circuitResult: isValid
                 };
             } catch (error) {
@@ -107,15 +107,15 @@ export class MidnightService {
         console.log('Using mock proof generation');
         return {
             proof: {
-                compliance_valid: true,
-                accreditation_level: input.accreditationLevel,
+                nft_ownership_valid: true,
+                nft_count: input.accreditationLevel,
                 timestamp: input.verificationTimestamp,
                 publicInputs: {
                     userDid: input.userDid
                 },
                 wallet: '1am'
             },
-            proofHash: this.generateMockHash(input.userDid, 'compliance')
+            proofHash: this.generateMockHash(input.userDid, 'nft_ownership')
         };
     }
 
@@ -124,32 +124,26 @@ export class MidnightService {
         const wallet = await this.ensureWalletConnected();
         if (wallet) {
             try {
-                // Use the compiled Compact circuit for rental trust verification
-                const isValid = rentalTrustCircuits.verify_rental_trust(
+                // Use the compiled Compact circuit for XRP balance verification
+                const isValid = xrpBalanceCircuits.verify_xrp_balance(
                     BigInt(input.totalRentals),
-                    BigInt(input.successfulRentals),
-                    BigInt(input.onTimeReturns)
+                    BigInt(10),
+                    BigInt(20)
                 );
                 
-                console.log('Rental trust circuit executed successfully:', isValid);
-                
-                const successRate = Math.round((input.successfulRentals / input.totalRentals) * 100);
-                const onTimeRate = Math.round((input.onTimeReturns / input.totalRentals) * 100);
+                console.log('XRP balance circuit executed successfully:', isValid);
                 
                 return {
                     proof: {
-                        trust_score_valid: isValid,
-                        success_rate: successRate,
-                        ontime_rate: onTimeRate,
+                        xrp_balance_valid: isValid,
+                        xrp_balance: input.totalRentals,
                         publicInputs: {
                             userDid: input.userDid,
-                            totalRentals: input.totalRentals,
-                            successfulRentals: input.successfulRentals,
-                            onTimeReturns: input.onTimeReturns
+                            xrpBalance: input.totalRentals
                         },
                         wallet: '1am'
                     },
-                    proofHash: this.generateMockHash(input.userDid, 'rental_trust'),
+                    proofHash: this.generateMockHash(input.userDid, 'xrp_balance'),
                     circuitResult: isValid
                 };
             } catch (error) {
@@ -159,56 +153,51 @@ export class MidnightService {
 
         // Fallback: Generate a mock proof for development
         console.log('Using mock proof generation');
-        const successRate = Math.round((input.successfulRentals / input.totalRentals) * 100);
-        const onTimeRate = Math.round((input.onTimeReturns / input.totalRentals) * 100);
-        
         return {
             proof: {
-                trust_score_valid: true,
-                success_rate: successRate,
-                ontime_rate: onTimeRate,
+                xrp_balance_valid: true,
+                xrp_balance: input.totalRentals,
                 publicInputs: {
                     userDid: input.userDid
                 },
                 wallet: '1am'
             },
-            proofHash: this.generateMockHash(input.userDid, 'rental_trust')
+            proofHash: this.generateMockHash(input.userDid, 'xrp_balance')
         };
     }
 
     async generateAirdropEligibilityProof(tokenHoldings: number, minHoldings: number, holdPeriod: number): Promise<any> {
-        // Use the compiled Compact circuit for airdrop eligibility verification
+        // Use the compiled Compact circuit for transaction history verification
         try {
-            const isValid = airdropEligibilityCircuits.verify_airdrop_eligibility(
+            const isValid = transactionHistoryCircuits.verify_transaction_history(
                 BigInt(tokenHoldings),
-                BigInt(minHoldings),
-                BigInt(holdPeriod)
+                BigInt(holdPeriod),
+                BigInt(5)
             );
             
-            console.log('Airdrop eligibility circuit executed successfully:', isValid);
+            console.log('Transaction history circuit executed successfully:', isValid);
             
             return {
                 proof: {
-                    eligible: isValid,
+                    tx_history_valid: isValid,
                     publicInputs: {
-                        tokenHoldings,
-                        minHoldings,
-                        holdPeriod
+                        txCount: tokenHoldings,
+                        walletAge: holdPeriod
                     },
                     wallet: '1am'
                 },
-                proofHash: this.generateMockHash('airdrop', 'eligibility'),
+                proofHash: this.generateMockHash('transaction_history', 'eligibility'),
                 circuitResult: isValid
             };
         } catch (error) {
             console.warn('Compact circuit execution failed, using fallback:', error);
             return {
                 proof: {
-                    eligible: true,
-                    publicInputs: { tokenHoldings, minHoldings, holdPeriod },
+                    tx_history_valid: true,
+                    publicInputs: { txCount: tokenHoldings, walletAge: holdPeriod },
                     wallet: '1am'
                 },
-                proofHash: this.generateMockHash('airdrop', 'eligibility')
+                proofHash: this.generateMockHash('transaction_history', 'eligibility')
             };
         }
     }
@@ -251,38 +240,37 @@ export class MidnightService {
     }
 
     async generateGovernancePowerProof(tokenBalance: number, votingWeight: number, participationHistory: number): Promise<any> {
-        // Use the compiled Compact circuit for governance power verification
+        // Use the compiled Compact circuit for trust line verification
         try {
-            const isValid = governancePowerCircuits.verify_governance_power(
+            const isValid = trustLineCircuits.verify_trust_line(
                 BigInt(tokenBalance),
-                BigInt(votingWeight),
-                BigInt(participationHistory)
+                tokenBalance > 0,
+                BigInt(1)
             );
             
-            console.log('Governance power circuit executed successfully:', isValid);
+            console.log('Trust line circuit executed successfully:', isValid);
             
             return {
                 proof: {
-                    hasVotingPower: isValid,
+                    trust_line_valid: isValid,
                     publicInputs: {
-                        tokenBalance,
-                        votingWeight,
-                        participationHistory
+                        trustLineCount: tokenBalance,
+                        hasRequiredTrust: tokenBalance > 0
                     },
                     wallet: '1am'
                 },
-                proofHash: this.generateMockHash('governance', 'power'),
+                proofHash: this.generateMockHash('trust_line', 'power'),
                 circuitResult: isValid
             };
         } catch (error) {
             console.warn('Compact circuit execution failed, using fallback:', error);
             return {
                 proof: {
-                    hasVotingPower: true,
-                    publicInputs: { tokenBalance, votingWeight, participationHistory },
+                    trust_line_valid: true,
+                    publicInputs: { trustLineCount: tokenBalance, hasRequiredTrust: tokenBalance > 0 },
                     wallet: '1am'
                 },
-                proofHash: this.generateMockHash('governance', 'power')
+                proofHash: this.generateMockHash('trust_line', 'power')
             };
         }
     }

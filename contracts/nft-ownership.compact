@@ -1,0 +1,10 @@
+pragma language_version >=0.22;
+import CompactStandardLibrary;
+
+// NFT Ownership ZK Proof for XRPL
+// Proves user owns specific NFTs without revealing entire portfolio
+
+export circuit verify_nft_ownership(nftCount: Uint<64>, minNfts: Uint<64>, walletAge: Uint<64>): Boolean {
+    const isValid = nftCount >= minNfts && walletAge >= 30;
+    return isValid;
+}

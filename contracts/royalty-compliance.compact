@@ -1,10 +1,10 @@
 pragma language_version >=0.22;
 import CompactStandardLibrary;
 
-// Royalty Compliance ZK Proof
-// Proves creator royalty compliance without revealing specific sales
+// NFT Royalty Compliance ZK Proof for XRPL
+// Proves creator royalty compliance without revealing specific NFT sales
 
 export circuit verify_royalty_compliance(totalSales: Uint<64>, royaltyPaid: Uint<64>, royaltyRate: Uint<64>): Boolean {
-    const isValid = royaltyPaid >= 1 && totalSales >= 1;
+    const isValid = royaltyPaid >= 1 && totalSales >= 1 && royaltyRate >= 1;
     return isValid;
 }

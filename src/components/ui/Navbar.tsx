@@ -15,12 +15,12 @@ export function Navbar() {
   const isActive = (path: string) => location.pathname === path;
 
   const zkProofItems = [
-    { to: '/compliance', icon: Shield, label: 'Compliance' },
-    { to: '/rental-trust', icon: ShieldCheck, label: 'Rental Trust' },
+    { to: '/compliance', icon: Shield, label: 'NFT Ownership' },
+    { to: '/rental-trust', icon: ShieldCheck, label: 'XRP Balance' },
     { to: '/verify', icon: FileCheck, label: 'Verify' },
-    { to: '/airdrop-eligibility', icon: Gift, label: 'Airdrop' },
+    { to: '/airdrop-eligibility', icon: Gift, label: 'Transaction History' },
     { to: '/royalty-compliance', icon: Heart, label: 'Royalty' },
-    { to: '/governance-power', icon: Vote, label: 'Governance' },
+    { to: '/governance-power', icon: Vote, label: 'Trust Lines' },
   ];
 
   const businessItems = [

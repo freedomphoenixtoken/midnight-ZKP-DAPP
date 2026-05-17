@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "test:zk": "tsx scripts/test-zk-integration.ts",
     "seed:demo": "tsx scripts/seed-demo-data.ts",
-    "compile:contracts": "compact compile contracts/compliance-passport.compact -o compiled-contracts/compliance-passport && compact compile contracts/rental-trust.compact -o compiled-contracts/rental-trust && compact compile contracts/airdrop-eligibility.compact -o compiled-contracts/airdrop-eligibility && compact compile contracts/royalty-compliance.compact -o compiled-contracts/royalty-compliance && compact compile contracts/governance-power.compact -o compiled-contracts/governance-power"
+    "compile:contracts": "wsl bash -c \"/home/freedomphoenix/.local/bin/compact compile contracts/nft-ownership.compact compiled-contracts/nft-ownership && /home/freedomphoenix/.local/bin/compact compile contracts/xrp-balance.compact compiled-contracts/xrp-balance && /home/freedomphoenix/.local/bin/compact compile contracts/transaction-history.compact compiled-contracts/transaction-history && /home/freedomphoenix/.local/bin/compact compile contracts/royalty-compliance.compact compiled-contracts/royalty-compliance && /home/freedomphoenix/.local/bin/compact compile contracts/trust-line.compact compiled-contracts/trust-line\""
   },
   "dependencies": {
     "@midnight-ntwrk/compact-js": "^2.5.0",
