@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Wallet, Check, AlertCircle, QrCode, Loader2, Smartphone } from 'lucide-react';
-import { XummSdk } from 'xumm-sdk';
 
 interface XRPLWalletConnectionProps {
   onConnect: (address: string) => void;
@@ -24,7 +23,6 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
   const [isSigning, setIsSigning] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [deepLinkUrl, setDeepLinkUrl] = useState<string>('');
-  const [isMobile, setIsMobile] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Detect mobile device
@@ -36,94 +34,87 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
   const connectXRPLWallet = async () => {
     if (isConnecting) return;
 
+    const mobile = checkMobile();
+
     try {
       setIsConnecting(true);
       setError(null);
-      setIsMobile(checkMobile());
-      console.log('Attempting to connect to XRPL wallet...');
+      console.log('Requesting Xumm payload from server...');
 
-      // Initialize Xumm SDK with environment variables
-      const xummApiKey = import.meta.env.VITE_XUMM_API_KEY || 'demo_api_key';
-      const xummApiSecret = import.meta.env.VITE_XUMM_API_SECRET || 'demo_api_secret';
-      const xumm = new XummSdk(xummApiKey, xummApiSecret);
-
-      // Create a sign request payload
-      const payload = await xumm.payload.create({
-        txjson: {
-          TransactionType: 'Payment',
-          Amount: '1',
-          Destination: 'rUn84CUYdNtszELcFJo51NUfs8ocw5Sj2L', // Xumm test address
-          Memos: [{
-            Memo: {
-              MemoData: btoa('WALLET_VERIFICATION'),
-              MemoFormat: btoa('VERIFICATION'),
-              MemoType: btoa('ZK_DAPP')
-            }
-          }]
-        },
-        options: {
-          force_network: 'TESTNET',
-          return_url: {
-            web: `${window.location.origin}/?wallet=connected`
-          }
-        },
-        custom_meta: {
-          identifier: 'ignition-zkp-wallet-connection',
-          instruction: 'Sign this transaction to verify your wallet ownership'
-        }
+      // Call Netlify function to create Xumm payload server-side (keeps API secret secure)
+      const response = await fetch('/.netlify/functions/create-xumm-payload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          returnUrl: `${window.location.origin}/?wallet=connected`,
+          identifier: 'ignition-zkp-wallet-connection'
+        })
       });
 
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to create sign request');
+      }
+
+      const payload = await response.json();
       console.log('Xumm payload created:', payload);
 
-      // Check if push notification was sent
-      if (payload.pushed) {
-        // Push notification sent - show waiting message
-        setIsSigning(true);
-        console.log('Push notification sent to device');
-      }
+      setIsSigning(true);
 
-      // Set QR code for desktop or deep link for mobile
-      if (isMobile) {
-        setDeepLinkUrl(payload.next.always);
-        console.log('Deep link set for mobile:', payload.next.always);
+      // Show QR code for desktop, deep link button for mobile
+      if (mobile) {
+        setDeepLinkUrl(payload.deepLinkUrl);
       } else {
-        setQrCodeUrl(payload.refs.qr_png);
-        console.log('QR code set for desktop:', payload.refs.qr_png);
+        setQrCodeUrl(payload.qrUrl);
       }
 
-      // Subscribe to payload updates
-      const subscription = await xumm.payload.subscribe(payload.uuid, async (event) => {
-        console.log('Payload event:', event);
-        
-        if (event.data.signed) {
-          console.log('Transaction signed successfully');
-          const signedTx = event.data.signed;
-          const walletAddress = signedTx.Account;
-          
-          // Clean up
-          subscription.resolve();
+      // Poll for signing status
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`/.netlify/functions/check-xumm-payload?uuid=${payload.uuid}`);
+          if (!statusRes.ok) return;
+
+          const status = await statusRes.json();
+          console.log('Payload status:', status);
+
+          if (status.signed && status.account) {
+            clearInterval(pollInterval);
+            setQrCodeUrl('');
+            setDeepLinkUrl('');
+            setIsSigning(false);
+            setIsConnecting(false);
+            onConnect(status.account);
+          } else if (status.cancelled || status.expired) {
+            clearInterval(pollInterval);
+            setQrCodeUrl('');
+            setDeepLinkUrl('');
+            setIsSigning(false);
+            setIsConnecting(false);
+            setError(status.cancelled ? 'Signing was cancelled.' : 'Sign request expired. Please try again.');
+          }
+        } catch (pollError) {
+          console.error('Polling error:', pollError);
+        }
+      }, 2000);
+
+      // Auto-cancel after 5 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (isSigning) {
           setQrCodeUrl('');
           setDeepLinkUrl('');
           setIsSigning(false);
-          
-          onConnect(walletAddress);
-        } else if (event.data.opened) {
-          console.log('Payload opened by user');
+          setIsConnecting(false);
+          setError('Sign request timed out. Please try again.');
         }
-      });
-
-      // Wait for subscription to complete
-      await subscription.resolved;
+      }, 300000);
 
     } catch (error) {
       console.error('Failed to connect XRPL wallet:', error);
-      setError(error instanceof Error ? error.message : 'Unknown error');
-      alert(`Failed to connect XRPL wallet: ${error instanceof Error ? error.message : 'Unknown error'}.\n\nPlease try again or ensure you have the Xumm/Xaman app installed.`);
-    } finally {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setError(msg);
       setIsConnecting(false);
       setIsSigning(false);
-      setQrCodeUrl('');
-      setDeepLinkUrl('');
     }
   };
 

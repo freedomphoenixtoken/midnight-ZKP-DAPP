@@ -2,6 +2,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Shield, ShieldCheck, FileCheck, Lock, Sparkles, Menu, X, Gift, Heart, Vote, Moon, Sun, Code, ShoppingCart, Activity, DollarSign, ChevronDown, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
+import '@midnight-ntwrk/dapp-connector-api';
+import type { InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 
 export function Navbar() {
   const location = useLocation();
@@ -60,14 +62,44 @@ export function Navbar() {
       }
 
       console.log('Midnight wallet extension found, attempting connection...');
-      
-      // Connect to the wallet using the correct method
+      console.log('Available wallet providers:', Object.keys(midnightWallet));
+
+      // Detect the correct wallet provider key
+      // 1AM wallet uses 'mnLace' or '1am' depending on version
+      const walletProvider =
+        midnightWallet.mnLace ||
+        midnightWallet['1am'] ||
+        midnightWallet['1AM'] ||
+        Object.values(midnightWallet)[0];
+
+      if (!walletProvider) {
+        throw new Error('No wallet provider found in window.midnight. Please ensure the 1AM wallet extension is installed and enabled.');
+      }
+
+      console.log('Found wallet provider, connecting to preprod...');
+
+      // Connect to the wallet using the correct method from Midnight documentation
       try {
-        // Try to connect using the standard connect method
-        const wallet = await midnightWallet.connect();
-        console.log('Wallet connected successfully:', wallet);
-        setIsWalletConnected(true);
-        alert('Midnight wallet connected successfully!');
+        const wallet: InitialAPI = walletProvider;
+        
+        // Connect to the preprod network
+        const connectedApi = await wallet.connect('preprod');
+        console.log('Connected to Midnight wallet');
+        
+        // Retrieve the shielded addresses from the wallet
+        const addresses = await connectedApi.getShieldedAddresses();
+        const walletAddress = addresses.shieldedAddress;
+        console.log('Wallet address:', walletAddress);
+        
+        // Check if the connection is established
+        const connectionStatus = await connectedApi.getConnectionStatus();
+        if (connectionStatus) {
+          setIsWalletConnected(true);
+          console.log('Connected to the wallet successfully');
+          alert('Midnight wallet connected successfully!');
+        } else {
+          throw new Error('Connection status check failed');
+        }
       } catch (connectError) {
         console.error('Connection failed:', connectError);
         throw connectError;

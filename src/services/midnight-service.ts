@@ -4,25 +4,7 @@ import { pureCircuits as xrpBalanceCircuits } from '../../compiled-contracts/xrp
 import { pureCircuits as transactionHistoryCircuits } from '../../compiled-contracts/transaction-history/contract/index';
 import { pureCircuits as royaltyComplianceCircuits } from '../../compiled-contracts/royalty-compliance/contract/index';
 import { pureCircuits as trustLineCircuits } from '../../compiled-contracts/trust-line/contract/index';
-
-// DApp Connector API types (from @midnight-ntwrk/dapp-connector-api)
-interface ConnectedAPI {
-  getWalletInfo: () => Promise<any>;
-  getBalance: () => Promise<any>;
-  submitTransaction: (tx: any) => Promise<any>;
-  balanceTransaction: (tx: any) => Promise<any>;
-}
-
-// Type declaration for window.midnight
-declare global {
-  interface Window {
-    midnight?: {
-      [key: string]: {
-        connect: (networkId: string) => Promise<ConnectedAPI>;
-      };
-    };
-  }
-}
+import type { ConnectedAPI } from '@midnight-ntwrk/dapp-connector-api';
 
 export class MidnightService {
     private walletApi: ConnectedAPI | null = null;

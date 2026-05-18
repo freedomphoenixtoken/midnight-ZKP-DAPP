@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Wallet, X, CheckCircle, AlertCircle, Copy, ExternalLink, Info, Loader2, QrCode, Smartphone } from 'lucide-react';
-import { XummSdk } from 'xumm-sdk';
 
 interface WalletConnectionProps {
   onConnect: (address: string) => void;
@@ -26,7 +25,6 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
   const [needsSigning, setNeedsSigning] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [deepLinkUrl, setDeepLinkUrl] = useState<string>('');
-  const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile device
   const checkMobile = () => {
@@ -61,88 +59,79 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
   };
 
   const handleTransactionSigning = async () => {
-    setIsMobile(checkMobile());
+    const mobile = checkMobile();
     setIsSigning(true);
     setError(null);
 
     try {
-      // Initialize Xumm SDK with environment variables
-      const xummApiKey = import.meta.env.VITE_XUMM_API_KEY || 'demo_api_key';
-      const xummApiSecret = import.meta.env.VITE_XUMM_API_SECRET || 'demo_api_secret';
-      const xumm = new XummSdk(xummApiKey, xummApiSecret);
+      console.log('Requesting Xumm payload from server...');
 
-      // Create a sign request payload for wallet verification
-      const payload = await xumm.payload.create({
-        txjson: {
-          TransactionType: 'Payment',
-          Amount: '1',
-          Destination: manualAddress,
-          Memos: [{
-            Memo: {
-              MemoData: btoa('WALLET_VERIFICATION'),
-              MemoFormat: btoa('VERIFICATION'),
-              MemoType: btoa('ZK_DAPP')
-            }
-          }]
-        },
-        options: {
-          force_network: 'TESTNET',
-          return_url: {
-            web: `${window.location.origin}/?wallet=connected`
-          }
-        },
-        custom_meta: {
-          identifier: 'ignition-zkp-wallet-verification',
-          instruction: 'Sign this transaction to verify you own this address'
-        }
+      // Call Netlify function server-side (API secret stays secure on server)
+      const response = await fetch('/.netlify/functions/create-xumm-payload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destination: manualAddress,
+          returnUrl: `${window.location.origin}/?wallet=connected`,
+          identifier: 'ignition-zkp-wallet-verification'
+        })
       });
 
-      console.log('Xumm payload created:', payload);
-
-      // Set QR code for desktop or deep link for mobile
-      if (isMobile) {
-        setDeepLinkUrl(payload.next.always);
-        console.log('Deep link set for mobile:', payload.next.always);
-      } else {
-        setQrCodeUrl(payload.refs.qr_png);
-        console.log('QR code set for desktop:', payload.refs.qr_png);
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to create sign request');
       }
 
-      // Subscribe to payload updates
-      const subscription = await xumm.payload.subscribe(payload.uuid, async (event) => {
-        console.log('Payload event:', event);
-        
-        if (event.data.signed) {
-          console.log('Transaction signed successfully');
-          const signedTx = event.data.signed;
-          const walletAddress = signedTx.Account;
-          
-          // Verify the signed address matches the entered address
-          if (walletAddress.toLowerCase() !== manualAddress.toLowerCase()) {
-            throw new Error('Signed wallet address does not match the entered address');
-          }
-          
-          // Clean up
-          subscription.resolve();
-          setQrCodeUrl('');
-          setDeepLinkUrl('');
-          setIsSigning(false);
-          
-          onConnect(manualAddress.trim());
-          setManualAddress('');
-          setNeedsSigning(false);
-        } else if (event.data.opened) {
-          console.log('Payload opened by user');
-        }
-      });
+      const payload = await response.json();
+      console.log('Xumm payload created:', payload);
 
-      // Wait for subscription to complete
-      await subscription.resolved;
+      // Show QR code for desktop, deep link button for mobile
+      if (mobile) {
+        setDeepLinkUrl(payload.deepLinkUrl);
+      } else {
+        setQrCodeUrl(payload.qrUrl);
+      }
+
+      // Poll for signing status every 2 seconds
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusRes = await fetch(`/.netlify/functions/check-xumm-payload?uuid=${payload.uuid}`);
+          if (!statusRes.ok) return;
+
+          const status = await statusRes.json();
+          console.log('Payload status:', status);
+
+          if (status.signed && status.account) {
+            clearInterval(pollInterval);
+            setQrCodeUrl('');
+            setDeepLinkUrl('');
+            setIsSigning(false);
+            setNeedsSigning(false);
+            onConnect(manualAddress.trim());
+            setManualAddress('');
+          } else if (status.cancelled || status.expired) {
+            clearInterval(pollInterval);
+            setQrCodeUrl('');
+            setDeepLinkUrl('');
+            setIsSigning(false);
+            setError(status.cancelled ? 'Signing was cancelled.' : 'Sign request expired. Please try again.');
+          }
+        } catch (pollError) {
+          console.error('Polling error:', pollError);
+        }
+      }, 2000);
+
+      // Auto-cancel after 5 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        setQrCodeUrl('');
+        setDeepLinkUrl('');
+        setIsSigning(false);
+      }, 300000);
 
     } catch (error) {
       console.error('Failed to sign transaction:', error);
-      setError(error instanceof Error ? error.message : 'Transaction signing failed. Please ensure you approve the transaction in your wallet.');
-    } finally {
+      setError(error instanceof Error ? error.message : 'Transaction signing failed.');
       setIsSigning(false);
       setQrCodeUrl('');
       setDeepLinkUrl('');

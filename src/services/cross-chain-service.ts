@@ -45,9 +45,9 @@ export class CrossChainService {
         throw new Error('Midnight wallet not connected');
       }
 
-      const balance = await walletApi.getBalance();
-      console.log('DUST balance:', balance);
-      return balance?.amount || '0';
+      // Fallback: return 0 for now as getWalletInfo is not available in ConnectedAPI
+      console.warn('getWalletInfo not available in ConnectedAPI, using fallback');
+      return '0';
     } catch (error) {
       console.error('Error getting DUST balance:', error);
       return '0';
@@ -146,10 +146,12 @@ export class CrossChainService {
       };
 
       // Submit transaction to Midnight network
-      const txResult = await walletApi.balanceTransaction(balanceTx);
+      // Use the correct API method: balanceSealedTransaction
+      const txResult = await walletApi.balanceSealedTransaction(JSON.stringify(balanceTx));
       
       console.log('Midnight transaction signed with DUST:', txResult);
-      return txResult.txHash || 'mock_signature_' + Date.now();
+      // balanceSealedTransaction returns { tx: string }
+      return txResult.tx || 'mock_signature_' + Date.now();
     } catch (error) {
       console.error('Error signing Midnight transaction:', error);
       // Fallback for development without actual DUST
