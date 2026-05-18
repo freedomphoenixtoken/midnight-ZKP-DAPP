@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Wallet, X, CheckCircle, AlertCircle, Copy, ExternalLink, Info } from 'lucide-react';
+import { Wallet, X, CheckCircle, AlertCircle, Copy, ExternalLink, Info, Loader2 } from 'lucide-react';
 
 interface WalletConnectionProps {
   onConnect: (address: string) => void;
@@ -10,6 +10,8 @@ interface WalletConnectionProps {
 export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: WalletConnectionProps) {
   const [manualAddress, setManualAddress] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isSigning, setIsSigning] = useState(false);
+  const [needsSigning, setNeedsSigning] = useState(false);
 
   const handleManualConnect = () => {
     setError(null);
@@ -34,8 +36,46 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
       return;
     }
 
-    onConnect(manualAddress.trim());
-    setManualAddress('');
+    setNeedsSigning(true);
+  };
+
+  const handleTransactionSigning = async () => {
+    if (!window.xrpl) {
+      alert('XRPL wallet extension not found. Please install an XRPL wallet extension to sign the transaction.');
+      return;
+    }
+
+    setIsSigning(true);
+    setError(null);
+
+    try {
+      // Connect to wallet to sign transaction
+      const wallet = await window.xrpl.connect();
+      
+      // Sign a transaction to verify ownership
+      const signResult = await window.xrpl.signTransaction({
+        TransactionType: 'Payment',
+        Account: wallet.address,
+        Amount: '1',
+        Destination: wallet.address
+      });
+      
+      console.log('Transaction signed successfully:', signResult);
+      
+      // Verify the signed address matches the entered address
+      if (wallet.address.toLowerCase() !== manualAddress.toLowerCase()) {
+        throw new Error('Signed wallet address does not match the entered address');
+      }
+
+      onConnect(manualAddress.trim());
+      setManualAddress('');
+      setNeedsSigning(false);
+    } catch (error) {
+      console.error('Failed to sign transaction:', error);
+      setError(error instanceof Error ? error.message : 'Transaction signing failed. Please ensure you approve the transaction in your wallet.');
+    } finally {
+      setIsSigning(false);
+    }
   };
 
   const copyAddress = () => {
@@ -100,7 +140,7 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
         </div>
         <div>
           <h3 className="text-lg font-bold text-gray-900">Connect XRPL Wallet</h3>
-          <p className="text-sm text-gray-600">Enter your XRPL wallet address to fetch real blockchain data</p>
+          <p className="text-sm text-gray-600">Enter your XRPL wallet address and sign a transaction to verify ownership</p>
         </div>
       </div>
 
@@ -117,7 +157,8 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
             setError(null);
           }}
           placeholder="r..."
-          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-lg"
+          disabled={needsSigning}
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
         {error && (
           <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
@@ -125,13 +166,51 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
             {error}
           </div>
         )}
-        <button
-          onClick={handleManualConnect}
-          disabled={!manualAddress}
-          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-6 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-        >
-          Connect Wallet
-        </button>
+        
+        {!needsSigning ? (
+          <button
+            onClick={handleManualConnect}
+            disabled={!manualAddress}
+            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 px-6 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+          >
+            Connect Wallet
+          </button>
+        ) : (
+          <div className="space-y-3">
+            {isSigning && (
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                  <div>
+                    <p className="text-sm font-semibold text-blue-900">Signing Transaction</p>
+                    <p className="text-xs text-blue-700">Please approve the transaction in your wallet to verify you own this address</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <button
+              onClick={handleTransactionSigning}
+              disabled={isSigning}
+              className={`w-full py-3 px-6 rounded-xl font-semibold transition-all duration-300 shadow-md ${
+                isSigning
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 hover:shadow-lg'
+              }`}
+            >
+              {isSigning ? 'Signing Transaction...' : 'Sign Transaction to Verify'}
+            </button>
+            <button
+              onClick={() => {
+                setNeedsSigning(false);
+                setError(null);
+              }}
+              disabled={isSigning}
+              className="w-full bg-gray-200 text-gray-700 py-2 px-6 rounded-xl hover:bg-gray-300 transition-colors font-medium disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Info */}
@@ -139,9 +218,9 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
         <div className="flex items-start gap-2">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <p className="font-semibold mb-1">Privacy & Security</p>
+            <p className="font-semibold mb-1">Transaction Signing Required</p>
             <p className="text-blue-700">
-              Your wallet data is fetched directly from the XRPL ledger. No sensitive information is stored on our servers. Only proof hashes are stored for verification.
+              To verify you own this wallet address, you'll need to sign a small transaction. This proves ownership without revealing your private keys. The transaction won't be submitted to the blockchain.
             </p>
           </div>
         </div>

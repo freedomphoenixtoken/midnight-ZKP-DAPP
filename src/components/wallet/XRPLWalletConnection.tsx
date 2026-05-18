@@ -7,19 +7,9 @@ interface XRPLWalletConnectionProps {
   connectedAddress?: string;
 }
 
-declare global {
-  interface Window {
-    xrpl?: {
-      connect: () => Promise<{ address: string }>;
-      disconnect: () => Promise<void>;
-      signTransaction: (tx: any) => Promise<any>;
-      submitTransaction: (tx: any) => Promise<any>;
-    };
-  }
-}
-
 export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress }: XRPLWalletConnectionProps) {
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isSigning, setIsSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const connectXRPLWallet = async () => {
@@ -40,6 +30,7 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
       console.log('XRPL wallet connected:', wallet.address);
 
       // Sign a transaction to verify wallet functionality
+      setIsSigning(true);
       try {
         const signResult = await window.xrpl.signTransaction({
           TransactionType: 'Payment',
@@ -50,14 +41,16 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
         console.log('Transaction signed successfully:', signResult);
       } catch (signError) {
         console.warn('Transaction signing failed, but connection succeeded:', signError);
-        // Continue even if signing fails for demo purposes
+        throw new Error('Transaction signing failed. Please ensure you approve the transaction in your wallet.');
+      } finally {
+        setIsSigning(false);
       }
 
       onConnect(wallet.address);
     } catch (error) {
       console.error('Failed to connect XRPL wallet:', error);
       setError(error instanceof Error ? error.message : 'Unknown error');
-      alert(`Failed to connect XRPL wallet: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure:\n1. XRPL wallet extension is installed\n2. Wallet is unlocked\n3. You are using a supported browser`);
+      alert(`Failed to connect XRPL wallet: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure:\n1. XRPL wallet extension is installed\n2. Wallet is unlocked\n3. You approve the transaction signing request`);
     } finally {
       setIsConnecting(false);
     }
@@ -114,17 +107,30 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
           </button>
         </div>
       ) : (
-        <button
-          onClick={connectXRPLWallet}
-          disabled={isConnecting}
-          className={`w-full font-medium py-3 px-4 rounded-lg transition-colors ${
-            isConnecting
-              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-              : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg'
-          }`}
-        >
-          {isConnecting ? 'Connecting...' : 'Connect XRPL Wallet'}
-        </button>
+        <div className="space-y-3">
+          {isSigning && (
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div>
+                  <p className="text-sm font-semibold text-blue-900">Signing Transaction</p>
+                  <p className="text-xs text-blue-700">Please approve the transaction in your wallet to verify connection</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <button
+            onClick={connectXRPLWallet}
+            disabled={isConnecting}
+            className={`w-full font-medium py-3 px-4 rounded-lg transition-colors ${
+              isConnecting
+                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg'
+            }`}
+          >
+            {isConnecting ? (isSigning ? 'Signing Transaction...' : 'Connecting...') : 'Connect XRPL Wallet'}
+          </button>
+        </div>
       )}
     </div>
   );
