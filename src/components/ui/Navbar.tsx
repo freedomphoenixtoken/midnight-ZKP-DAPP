@@ -40,49 +40,41 @@ export function Navbar() {
 
     try {
       setIsConnecting(true);
-      console.log('Attempting to connect to wallet...');
+      console.log('Attempting to connect to Midnight wallet...');
       
-      // Check if window.midnight exists
+      // Check if window is available
       if (typeof window === 'undefined') {
         console.error('Window is not available');
         alert('Window is not available. This should only happen in server-side rendering.');
         return;
       }
 
-      console.log('Window object available, checking for midnight...');
+      console.log('Window object available, checking for Midnight wallet...');
       
-      // Check if midnight exists on window
-      if (!(window as any).midnight) {
-        console.error('window.midnight not found');
-        alert('Midnight wallet not found. Please install the 1AM wallet extension from https://1am.xyz/');
+      // Check if Midnight wallet extension is available
+      const midnightWallet = (window as any).midnight;
+      if (!midnightWallet) {
+        console.error('Midnight wallet extension not found');
+        alert('Midnight wallet extension not found. Please install the 1AM wallet extension from https://1am.xyz/');
         return;
       }
 
-      console.log('window.midnight found, checking for 1am wallet...');
+      console.log('Midnight wallet extension found, attempting connection...');
       
-      // Check if 1AM wallet exists
-      const wallet = (window as any).midnight['1am'];
-      if (!wallet) {
-        console.error('1AM wallet not found in window.midnight');
-        alert('1AM wallet not found. Please install the 1AM wallet extension from https://1am.xyz/');
-        return;
-      }
-
-      console.log('1AM wallet found, attempting connection...');
-      
-      // Try to connect to preprod network (correct network ID)
+      // Connect to the wallet using the correct method
       try {
-        await wallet.connect('preprod');
+        // Try to connect using the standard connect method
+        const wallet = await midnightWallet.connect();
+        console.log('Wallet connected successfully:', wallet);
         setIsWalletConnected(true);
-        console.log('Wallet connected successfully to preprod');
-        alert('Wallet connected successfully!');
+        alert('Midnight wallet connected successfully!');
       } catch (connectError) {
-        console.error('Connection to preprod failed:', connectError);
+        console.error('Connection failed:', connectError);
         throw connectError;
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);
-      alert(`Failed to connect wallet: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure:\n1. 1AM wallet extension is installed\n2. Wallet is unlocked\n3. You are using a supported browser (Brave, Chrome)\n4. Check browser console for more details`);
+      alert(`Failed to connect Midnight wallet: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure:\n1. 1AM wallet extension is installed\n2. Wallet is unlocked\n3. You are using a supported browser (Brave, Chrome)\n4. Check browser console for more details`);
     } finally {
       setIsConnecting(false);
     }

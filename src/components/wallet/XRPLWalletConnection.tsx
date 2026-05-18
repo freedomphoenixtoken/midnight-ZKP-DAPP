@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Wallet, Check, AlertCircle, QrCode, Loader2 } from 'lucide-react';
+import { Wallet, Check, AlertCircle, QrCode, Loader2, Smartphone } from 'lucide-react';
+import { XummSdk } from 'xumm-sdk';
 
 interface XRPLWalletConnectionProps {
   onConnect: (address: string) => void;
@@ -7,11 +8,30 @@ interface XRPLWalletConnectionProps {
   connectedAddress?: string;
 }
 
+declare global {
+  interface Window {
+    xrpl?: {
+      connect: () => Promise<{ address: string }>;
+      disconnect: () => Promise<void>;
+      signTransaction: (tx: any) => Promise<any>;
+      submitTransaction: (tx: any) => Promise<any>;
+    };
+  }
+}
+
 export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress }: XRPLWalletConnectionProps) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSigning, setIsSigning] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [deepLinkUrl, setDeepLinkUrl] = useState<string>('');
+  const [isMobile, setIsMobile] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Detect mobile device
+  const checkMobile = () => {
+    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    return /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+  };
 
   const connectXRPLWallet = async () => {
     if (isConnecting) return;
@@ -19,25 +39,20 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
     try {
       setIsConnecting(true);
       setError(null);
+      setIsMobile(checkMobile());
       console.log('Attempting to connect to XRPL wallet...');
 
-      // Check if XRPL wallet extension is available
-      if (!window.xrpl) {
-        throw new Error('XRPL wallet extension not found. Please install an XRPL wallet extension.');
-      }
+      // Initialize Xumm SDK with environment variables
+      const xummApiKey = import.meta.env.VITE_XUMM_API_KEY || 'demo_api_key';
+      const xummApiSecret = import.meta.env.VITE_XUMM_API_SECRET || 'demo_api_secret';
+      const xumm = new XummSdk(xummApiKey, xummApiSecret);
 
-      // Connect to XRPL wallet
-      const wallet = await window.xrpl.connect();
-      console.log('XRPL wallet connected:', wallet.address);
-
-      // Sign a transaction to verify wallet functionality
-      setIsSigning(true);
-      try {
-        const signResult = await window.xrpl.signTransaction({
+      // Create a sign request payload
+      const payload = await xumm.payload.create({
+        txjson: {
           TransactionType: 'Payment',
-          Account: wallet.address,
           Amount: '1',
-          Destination: wallet.address,
+          Destination: 'rUn84CUYdNtszELcFJo51NUfs8ocw5Sj2L', // Xumm test address
           Memos: [{
             Memo: {
               MemoData: btoa('WALLET_VERIFICATION'),
@@ -45,38 +60,70 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
               MemoType: btoa('ZK_DAPP')
             }
           }]
-        });
-        console.log('Transaction signed successfully:', signResult);
-      } catch (signError) {
-        console.error('Transaction signing failed:', signError);
-        
-        // Fallback to Xumm/Xaman QR code signing
-        try {
-          // Mock Xumm API call for demo - in production, use real Xumm API
-          const mockUuid = `xumm_mock_${Date.now()}`;
-          const mockQrUrl = `https://xumm.app/detect/qr:${mockUuid}`;
-          setQrCodeUrl(mockQrUrl);
-          
-          // Simulate waiting for QR code scan
-          await new Promise(resolve => setTimeout(resolve, 5000));
-          
-          console.log('QR code signing completed');
-        } catch (qrError) {
-          console.error('QR code signing failed:', qrError);
-          throw new Error('Transaction signing failed. Please approve the transaction in your wallet to complete the connection.');
+        },
+        options: {
+          force_network: 'TESTNET',
+          return_url: {
+            web: `${window.location.origin}/?wallet=connected`
+          }
+        },
+        custom_meta: {
+          identifier: 'ignition-zkp-wallet-connection',
+          instruction: 'Sign this transaction to verify your wallet ownership'
         }
-      } finally {
-        setIsSigning(false);
-        setQrCodeUrl('');
+      });
+
+      console.log('Xumm payload created:', payload);
+
+      // Check if push notification was sent
+      if (payload.pushed) {
+        // Push notification sent - show waiting message
+        setIsSigning(true);
+        console.log('Push notification sent to device');
       }
 
-      onConnect(wallet.address);
+      // Set QR code for desktop or deep link for mobile
+      if (isMobile) {
+        setDeepLinkUrl(payload.next.always);
+        console.log('Deep link set for mobile:', payload.next.always);
+      } else {
+        setQrCodeUrl(payload.refs.qr_png);
+        console.log('QR code set for desktop:', payload.refs.qr_png);
+      }
+
+      // Subscribe to payload updates
+      const subscription = await xumm.payload.subscribe(payload.uuid, async (event) => {
+        console.log('Payload event:', event);
+        
+        if (event.data.signed) {
+          console.log('Transaction signed successfully');
+          const signedTx = event.data.signed;
+          const walletAddress = signedTx.Account;
+          
+          // Clean up
+          subscription.resolve();
+          setQrCodeUrl('');
+          setDeepLinkUrl('');
+          setIsSigning(false);
+          
+          onConnect(walletAddress);
+        } else if (event.data.opened) {
+          console.log('Payload opened by user');
+        }
+      });
+
+      // Wait for subscription to complete
+      await subscription.resolved;
+
     } catch (error) {
       console.error('Failed to connect XRPL wallet:', error);
       setError(error instanceof Error ? error.message : 'Unknown error');
-      alert(`Failed to connect XRPL wallet: ${error instanceof Error ? error.message : 'Unknown error'}.\n\nIMPORTANT: Transaction signing is required to verify wallet ownership. Please:\n1. Install XRPL wallet extension\n2. Unlock your wallet\n3. Approve the transaction signing request`);
+      alert(`Failed to connect XRPL wallet: ${error instanceof Error ? error.message : 'Unknown error'}.\n\nPlease try again or ensure you have the Xumm/Xaman app installed.`);
     } finally {
       setIsConnecting(false);
+      setIsSigning(false);
+      setQrCodeUrl('');
+      setDeepLinkUrl('');
     }
   };
 
@@ -168,6 +215,26 @@ export function XRPLWalletConnection({ onConnect, onDisconnect, connectedAddress
                   <img src={qrCodeUrl} alt="Xumm QR Code" className="w-48 h-48" />
                 </div>
                 <p className="text-xs text-purple-600 text-center">Waiting for wallet signature...</p>
+              </div>
+            </div>
+          )}
+          {deepLinkUrl && (
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+              <div className="flex flex-col items-center gap-3">
+                <Smartphone className="w-6 h-6 text-blue-600" />
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-blue-900 mb-2">Open Xumm/Xaman App</p>
+                  <p className="text-xs text-blue-700 mb-3">Tap the button below to open your wallet and sign the transaction</p>
+                </div>
+                <a
+                  href={deepLinkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:shadow-lg transition-all"
+                >
+                  Open Wallet to Sign
+                </a>
+                <p className="text-xs text-blue-600 text-center">Waiting for wallet signature...</p>
               </div>
             </div>
           )}
