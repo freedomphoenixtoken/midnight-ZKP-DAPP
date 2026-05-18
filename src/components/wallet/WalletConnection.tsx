@@ -52,12 +52,19 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
       // Connect to wallet to sign transaction
       const wallet = await window.xrpl.connect();
       
-      // Sign a transaction to verify ownership
+      // Sign a transaction to verify ownership with memo
       const signResult = await window.xrpl.signTransaction({
         TransactionType: 'Payment',
         Account: wallet.address,
         Amount: '1',
-        Destination: wallet.address
+        Destination: wallet.address,
+        Memos: [{
+          Memo: {
+            MemoData: btoa('WALLET_VERIFICATION'),
+            MemoFormat: btoa('VERIFICATION'),
+            MemoType: btoa('ZK_DAPP')
+          }
+        }]
       });
       
       console.log('Transaction signed successfully:', signResult);
@@ -140,7 +147,7 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
         </div>
         <div>
           <h3 className="text-lg font-bold text-gray-900">Connect XRPL Wallet</h3>
-          <p className="text-sm text-gray-600">Enter your XRPL wallet address and sign a transaction to verify ownership</p>
+          <p className="text-sm text-gray-600">Enter address and sign transaction to verify ownership</p>
         </div>
       </div>
 
@@ -177,13 +184,26 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
           </button>
         ) : (
           <div className="space-y-3">
+            {!isSigning && (
+              <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-purple-100 p-2 rounded-lg">
+                    <Wallet className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div className="text-sm text-purple-900">
+                    <p className="font-semibold mb-1">Transaction Signing Required</p>
+                    <p className="text-purple-700">You will be prompted to sign a transaction in your wallet to verify you own this address. The transaction will not be submitted to the blockchain.</p>
+                  </div>
+                </div>
+              </div>
+            )}
             {isSigning && (
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+              <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
                 <div className="flex items-center gap-3">
-                  <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                  <Loader2 className="w-6 h-6 text-yellow-600 animate-spin" />
                   <div>
-                    <p className="text-sm font-semibold text-blue-900">Signing Transaction</p>
-                    <p className="text-xs text-blue-700">Please approve the transaction in your wallet to verify you own this address</p>
+                    <p className="text-sm font-semibold text-yellow-900">Waiting for Transaction Signature</p>
+                    <p className="text-xs text-yellow-700">Please approve the transaction in your wallet to verify ownership</p>
                   </div>
                 </div>
               </div>
@@ -197,7 +217,7 @@ export function WalletConnection({ onConnect, onDisconnect, connectedAddress }: 
                   : 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-700 hover:to-cyan-700 hover:shadow-lg'
               }`}
             >
-              {isSigning ? 'Signing Transaction...' : 'Sign Transaction to Verify'}
+              {isSigning ? 'Please Sign Transaction in Wallet...' : 'Sign Transaction to Verify'}
             </button>
             <button
               onClick={() => {
